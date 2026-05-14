@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lily Image Editor</title>
+    <link rel="stylesheet" th:href="@{/css/base.css}" href="/css/base.css">
+    <link rel="stylesheet" th:href="@{/css/themes.css}" href="/css/themes.css">
+    <link rel="stylesheet" th:href="@{/css/layout.css}" href="/css/layout.css">
+    <link rel="stylesheet" th:href="@{/css/components.css}" href="/css/components.css">
+</head>
+<body data-theme="dark">
+<div class="app-shell">
+    <header th:replace="~{fragments/topbar :: topbar}"></header>
+
+    <main class="workspace">
+        <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+        <div class="splitter-handle" data-resize-handle="left" role="separator" aria-orientation="vertical" tabindex="0"></div>
+        <section th:replace="~{fragments/viewer :: viewer}"></section>
+        <div class="splitter-handle" data-resize-handle="right" role="separator" aria-orientation="vertical" tabindex="0"></div>
+        <aside class="right-panel" data-i18n-aria-label="LBL_RIGHT_PANEL"></aside>
+    </main>
+</div>
+
+<div class="dialog-backdrop" id="message-dialog" hidden>
+    <section class="message-box" role="alertdialog" aria-modal="true" aria-labelledby="message-dialog-title">
+        <h2 id="message-dialog-title" data-i18n="APP_NAME"></h2>
+        <p id="message-dialog-body"></p>
+        <div class="message-actions">
+            <button class="dialog-button" type="button" id="message-dialog-ok" data-i18n="BTN_OK"></button>
+        </div>
+    </section>
+</div>
+
+<input id="file-input" type="file" multiple hidden>
+<input id="folder-input" type="file" webkitdirectory directory multiple hidden>
+
+<script type="module" th:src="@{/js/app.js}" src="/js/app.js"></script>
+</body>
+</html>

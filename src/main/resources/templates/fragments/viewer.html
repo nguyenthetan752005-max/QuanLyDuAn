@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section class="viewer panel" th:fragment="viewer">
+    <div class="tab-strip" id="tab-strip" hidden></div>
+
+    <div class="viewer-empty" id="viewer-empty">
+        <p data-i18n="LBL_NO_IMAGE"></p>
+    </div>
+
+    <div class="viewer-stage" id="viewer-stage" hidden>
+        <img id="active-image" alt="">
+    </div>
+</section>
+</body>
+</html>

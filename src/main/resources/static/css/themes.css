@@ -1,0 +1,83 @@
+body[data-theme="light"] {
+    --bg: #F8F9FA;
+    --bg-elevated: #FFFFFF;
+    --bg-muted: #FFFFFF;
+    --bg-hover: #D6DCE1;
+    --bg-pressed: #C5CDD4;
+    --splitter: #DEE2E6;
+    --border: #DEE2E6;
+    --border-strong: #CED4DA;
+    --button-bg: #FFFFFF;
+    --button-text: #495057;
+    --text: #343A40;
+    --text-muted: #868E96;
+    --accent: #0D6EFD;
+    --accent-border: #0B5ED7;
+    --accent-soft: #E7F1FF;
+    --active: #0D6EFD;
+    --tab-bg: #E9ECEF;
+    --tab-hover: #D6DCE1;
+    --tab-active-bg: #FFFFFF;
+    --menu-bg: #FFFFFF;
+    --channel-red: #DC3545;
+    --channel-green: #198754;
+    --channel-blue: #0D6EFD;
+    --theme-icon: url("/images/AppIconLight.png");
+    --shadow: none;
+}
+
+body[data-theme="warm"] {
+    --bg: #F4ECD8;
+    --bg-elevated: #FDFBF7;
+    --bg-muted: #FDFBF7;
+    --bg-hover: #D4C4AC;
+    --bg-pressed: #C8B69C;
+    --splitter: #DBCDBA;
+    --border: #DBCDBA;
+    --border-strong: #D1C0AA;
+    --button-bg: #EBE0CD;
+    --button-text: #5C4A3D;
+    --text: #4A3B32;
+    --text-muted: #8C7A6B;
+    --accent: #D35400;
+    --accent-border: #BA4A00;
+    --accent-soft: #FAD7A1;
+    --active: #D35400;
+    --tab-bg: #EBE0CD;
+    --tab-hover: #D4C4AC;
+    --tab-active-bg: #FDFBF7;
+    --menu-bg: #FDFBF7;
+    --channel-red: #C0392B;
+    --channel-green: #2E7D32;
+    --channel-blue: #2980B9;
+    --theme-icon: url("/images/AppIconWarm.png");
+    --shadow: none;
+}
+
+body[data-theme="cold"] {
+    --bg: #E6F0FA;
+    --bg-elevated: #F0F6FC;
+    --bg-muted: #F0F6FC;
+    --bg-hover: #B8D0E6;
+    --bg-pressed: #A5C3DC;
+    --splitter: #C5D9ED;
+    --border: #C5D9ED;
+    --border-strong: #B2CBE1;
+    --button-bg: #D6E4F0;
+    --button-text: #2A4365;
+    --text: #1A365D;
+    --text-muted: #6B8BAA;
+    --accent: #00A8CC;
+    --accent-border: #008BAA;
+    --accent-soft: #A3D8F4;
+    --active: #005F8A;
+    --tab-bg: #D6E4F0;
+    --tab-hover: #B8D0E6;
+    --tab-active-bg: #F0F6FC;
+    --menu-bg: #F0F6FC;
+    --channel-red: #E53E3E;
+    --channel-green: #047857;
+    --channel-blue: #00A8CC;
+    --theme-icon: url("/images/AppIconCold.png");
+    --shadow: none;
+}
