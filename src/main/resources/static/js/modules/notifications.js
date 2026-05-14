@@ -1,12 +1,18 @@
 import { refs } from "./dom.js";
 
+let lastFocused = null;
+
 export function showWarning(message) {
+    if (!refs.messageDialog || !refs.messageDialogBody) return;
+    lastFocused = document.activeElement;
     refs.messageDialogBody.textContent = message;
     refs.messageDialog.hidden = false;
-    refs.messageDialogOk.focus();
+    refs.messageDialogOk?.focus();
 }
 
 export function setupNotifications() {
+    if (!refs.messageDialog || !refs.messageDialogOk) return;
+
     refs.messageDialogOk.addEventListener("click", closeDialog);
     refs.messageDialog.addEventListener("click", (event) => {
         if (event.target === refs.messageDialog) {
@@ -21,5 +27,9 @@ export function setupNotifications() {
 }
 
 function closeDialog() {
+    if (!refs.messageDialog) return;
     refs.messageDialog.hidden = true;
+    if (lastFocused && typeof lastFocused.focus === "function") {
+        try { lastFocused.focus(); } catch {}
+    }
 }

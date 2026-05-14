@@ -253,93 +253,121 @@
     padding-left: 0;
 }
 
-.tab-strip {
-    display: flex;
-    gap: 2px;
-    padding: 0;
-    height: 40px;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: none;
-}
-
-.tab-strip::-webkit-scrollbar {
-    display: none;
-}
-
-.tab-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 174px;
-    max-width: 174px;
-    min-height: 40px;
-    padding: 0 8px 0 18px;
-    border: 1px solid var(--border-strong);
-    border-top: none;
-    border-bottom-color: var(--border);
-    border-radius: 4px 4px 0 0;
-    background: var(--tab-bg);
-    color: var(--text-muted);
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.tab-chip.is-active {
-    background: var(--tab-active-bg);
-    color: var(--text);
-    border-color: var(--border-strong);
-    border-bottom-color: var(--tab-active-bg);
-}
-
-.tab-close {
-    width: 18px;
-    aspect-ratio: 1;
-    border: none;
-    border-radius: 4px;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-}
-
-.viewer-empty,
-.viewer-stage {
-    min-height: 0;
-    margin: 0;
-    border: none;
-    border-radius: 0;
+.viewer-drop-zone {
+    display: grid;
+    flex: 1;
+    width: 100%;
     background: var(--bg-elevated);
+    position: relative;
+    padding: 0;
+    overflow: hidden;
+}
+
+.canvas-container {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none; /* Allows drop events to pass through to drop-zone-content */
+}
+
+.canvas-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: move;
+    pointer-events: auto; /* Re-enable events for items */
+    user-select: none;
+    transition: outline 0.1s ease;
+    transform-origin: top left;
+    box-sizing: border-box;
+    touch-action: none; /* Crucial for touchpad/touch resize */
+}
+
+.canvas-item.is-active {
+    outline: 2px solid var(--active);
+}
+
+.canvas-item .resize-handle {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background: #ffffff;
+    border: 2px solid var(--active);
+    z-index: 30;
+    display: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.canvas-item.is-active .resize-handle {
+    display: block;
+}
+
+.resize-handle.nw { top: -7px; left: -7px; cursor: nw-resize; }
+.resize-handle.ne { top: -7px; right: -7px; cursor: ne-resize; }
+.resize-handle.sw { bottom: -7px; left: -7px; cursor: sw-resize; }
+.resize-handle.se { bottom: -7px; right: -7px; cursor: se-resize; }
+.resize-handle.n { top: -7px; left: calc(50% - 7px); cursor: n-resize; }
+.resize-handle.s { bottom: -7px; left: calc(50% - 7px); cursor: s-resize; }
+.resize-handle.e { top: calc(50% - 7px); right: -7px; cursor: e-resize; }
+.resize-handle.w { top: calc(50% - 7px); left: -7px; cursor: w-resize; }
+
+.canvas-item:hover:not(.is-active) {
+    outline: 1px dashed var(--active);
+}
+
+.canvas-item.is-dragging {
+    cursor: grabbing;
+    opacity: 0.8;
+}
+
+.canvas-item img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    object-fit: fill;
+}
+
+.drop-zone-content {
+    width: calc(100% - 40px);
+    height: calc(100% - 40px);
+    margin: 20px;
+    border: 2px dashed var(--border-strong);
+    border-radius: 8px;
+    background: #ffffff;
+    display: grid;
+    place-items: center;
+    color: #333333;
+    transition: all 0.2s ease;
+    font-size: 24px;
+    font-weight: 500;
+    z-index: 1;
+}
+
+.viewer-drop-zone.drag-over .drop-zone-content {
+    background: #f0f0f0;
+    border-color: var(--active);
+    transform: scale(1.02);
+}
+
+.viewer-stage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    z-index: 10;
+    background: var(--bg-elevated);
+    padding: 20px;
 }
 
 .tab-strip[hidden],
-.viewer-empty[hidden],
+.drop-zone-content[hidden],
 .viewer-stage[hidden],
 .dialog-backdrop[hidden] {
     display: none;
-}
-
-.viewer-empty {
-    display: grid;
-    place-items: center;
-    text-align: center;
-    padding: 24px;
-}
-
-.viewer-empty p {
-    margin: 0;
-    font-size: 30px;
-}
-
-.viewer-empty span {
-    color: var(--text-muted);
-}
-
-.viewer-stage {
-    display: grid;
-    place-items: center;
-    padding: 12px 80px 0;
 }
 
 .viewer-stage img {

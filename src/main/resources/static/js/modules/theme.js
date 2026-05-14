@@ -2,19 +2,29 @@ import { refs } from "./dom.js";
 import { state } from "./state.js";
 import { text } from "./strings.js";
 
-export function setStatus(text) {
-    refs.status.textContent = text;
+const THEME_KEY = "lily-theme";
+
+export function setStatus(t) {
+    if (refs.status) {
+        refs.status.textContent = t;
+    }
 }
 
 export function setupThemeSwitching() {
-    document.querySelectorAll("[data-theme-option]").forEach((button) => {
-        button.addEventListener("click", () => {
-            const theme = button.dataset.themeOption;
-            if (!state.themes.includes(theme)) {
-                return;
-            }
+    // Áp dụng theme đã lưu
+    const saved = localStorage.getItem(THEME_KEY);
+    const initial = saved && state.themes.includes(saved) ? saved : "dark";
+    if (refs.body) refs.body.dataset.theme = initial;
 
-            refs.body.dataset.theme = theme;
+    document.querySelectorAll("[data-theme-option]").forEach((button) => {
+        const theme = button.dataset.themeOption;
+        button.classList.toggle("is-active", theme === initial);
+
+        button.addEventListener("click", () => {
+            if (!state.themes.includes(theme)) return;
+            if (refs.body) refs.body.dataset.theme = theme;
+            localStorage.setItem(THEME_KEY, theme);
+
             document.querySelectorAll("[data-theme-option]").forEach((item) => {
                 item.classList.toggle("is-active", item.dataset.themeOption === theme);
             });

@@ -16,6 +16,7 @@ export const STRINGS = {
     LBL_EXPLORER: "EXPLORER",
     LBL_NO_OPENED_FOLDER: "No opened folder.",
     LBL_NO_IMAGE: "No image loaded",
+    LBL_DROP_HERE: "Kéo thả ảnh vào đây",
     LBL_RIGHT_PANEL: "Properties panel",
 
     BTN_OK: "OK",

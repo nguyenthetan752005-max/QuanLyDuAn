@@ -1,5 +1,5 @@
 import { refs } from "./dom.js";
-import { addFolderImport, addLooseFile, getActiveTab, setActiveTab } from "./state.js";
+import { addFolderImport, addLooseFile, addToCanvas, getActiveTab } from "./state.js";
 import { showWarning } from "./notifications.js";
 import { STRINGS, text } from "./strings.js";
 import { setStatus } from "./theme.js";
@@ -8,7 +8,28 @@ import { renderApp } from "./ui.js";
 const SUPPORTED_IMAGE_EXTENSIONS = new Set(STRINGS.SUPPORTED_IMAGE_EXTENSIONS);
 
 export function handleFileInputChange(event) {
-    const selectedFiles = Array.from(event.target.files);
+    try {
+        processFiles(Array.from(event.target.files || []));
+    } finally {
+        if (refs.fileInput) refs.fileInput.value = "";
+    }
+}
+
+export function handleDroppedFiles(files, x = 100, y = 100) {
+    const { imageFiles } = partitionImageFiles(files);
+    
+    imageFiles.forEach((file, index) => {
+        const tab = addLooseFile(file);
+        addToCanvas(tab.id, x + index * 20, y + index * 20);
+    });
+
+    renderApp();
+    if (imageFiles.length > 0) {
+        setStatus(text("STATUS_IMPORTED_FILES", { count: imageFiles.length }));
+    }
+}
+
+function processFiles(selectedFiles) {
     const { imageFiles, rejectedFiles } = partitionImageFiles(selectedFiles);
 
     if (rejectedFiles.length > 0) {
@@ -16,11 +37,9 @@ export function handleFileInputChange(event) {
     }
 
     imageFiles.forEach((file) => {
-        const tab = addLooseFile(file);
-        setActiveTab(tab.id);
+        addLooseFile(file);
     });
 
-    refs.fileInput.value = "";
     renderApp();
     if (imageFiles.length > 0) {
         setStatus(text("STATUS_IMPORTED_FILES", { count: imageFiles.length }));
@@ -28,29 +47,30 @@ export function handleFileInputChange(event) {
 }
 
 export function handleFolderInputChange(event) {
-    const selectedFiles = Array.from(event.target.files);
-    const { imageFiles, rejectedFiles } = partitionImageFiles(selectedFiles);
-    const grouped = groupFilesByFolder(imageFiles);
+    try {
+        const selectedFiles = Array.from(event.target.files || []);
+        const { imageFiles, rejectedFiles } = partitionImageFiles(selectedFiles);
+        const grouped = groupFilesByFolder(imageFiles);
 
-    grouped.forEach((files, folderName) => {
-        const folder = addFolderImport(folderName, files);
-        const lastTabId = folder.tabIds[folder.tabIds.length - 1];
-        setActiveTab(lastTabId);
-    });
+        grouped.forEach((files, folderName) => {
+            addFolderImport(folderName, files);
+        });
 
-    refs.folderInput.value = "";
-    renderApp();
-    if (imageFiles.length > 0) {
-        setStatus(text("STATUS_IMPORTED_FOLDER_IMAGES", { count: imageFiles.length }));
-    } else if (selectedFiles.length > 0) {
-        showWarning(text("MSG_NO_SUPPORTED_IMAGES", { formats: STRINGS.SUPPORTED_IMAGE_FORMATS }));
-    }
+        renderApp();
+        if (imageFiles.length > 0) {
+            setStatus(text("STATUS_IMPORTED_FOLDER_IMAGES", { count: imageFiles.length }));
+        } else if (selectedFiles.length > 0) {
+            showWarning(text("MSG_NO_SUPPORTED_IMAGES", { formats: STRINGS.SUPPORTED_IMAGE_FORMATS }));
+        }
 
-    if (imageFiles.length > 0 && rejectedFiles.length > 0) {
-        setStatus(text("STATUS_IMPORTED_WITH_SKIPS", {
-            count: imageFiles.length,
-            skipped: rejectedFiles.length
-        }));
+        if (imageFiles.length > 0 && rejectedFiles.length > 0) {
+            setStatus(text("STATUS_IMPORTED_WITH_SKIPS", {
+                count: imageFiles.length,
+                skipped: rejectedFiles.length
+            }));
+        }
+    } finally {
+        if (refs.folderInput) refs.folderInput.value = "";
     }
 }
 
@@ -96,7 +116,6 @@ function isSupportedImageFile(file) {
     if (!SUPPORTED_IMAGE_EXTENSIONS.has(extension)) {
         return false;
     }
-
     return file.type === "" || file.type.startsWith("image/");
 }
 

@@ -5,7 +5,6 @@ import { setStatus } from "./theme.js";
 
 export function renderApp() {
     renderExplorer();
-    renderTabs();
     renderViewer();
     updateToolbarActions();
     updateEmptyStates();
@@ -15,7 +14,10 @@ export function closeTab(tabId) {
     removeTab(tabId);
     renderApp();
     if (state.activeTabId) {
-        setStatus(text("STATUS_OPENED", { name: getActiveTab().name }));
+        const active = getActiveTab();
+        if (active) {
+            setStatus(text("STATUS_OPENED", { name: active.name }));
+        }
     } else {
         setStatus(text("STATUS_WORKSPACE_CLEARED"));
     }
@@ -28,9 +30,11 @@ export function toggleFolderGroup(folderName) {
 
 export function toggleSectionVisibility(sectionId, toggleButton) {
     const target = document.getElementById(sectionId);
+    if (!target) return;
     const willHide = !target.hidden;
     target.hidden = willHide;
-    updateCaret(toggleButton.querySelector(".tree-caret"), willHide);
+    const caret = toggleButton?.querySelector(".tree-caret");
+    updateCaret(caret, willHide);
 }
 
 function renderExplorer() {
@@ -45,11 +49,20 @@ function renderExplorer() {
         toggle.type = "button";
         toggle.className = "tree-root";
         toggle.dataset.folderToggle = folder.name;
-        toggle.innerHTML = `
-            <span class="tree-caret ${folder.collapsed ? "is-closed" : "is-open"}" aria-hidden="true"></span>
-            <span class="tree-label">${folder.name}</span>
-            <span class="tree-meta">${folder.tabIds.length}</span>
-        `;
+
+        const caret = document.createElement("span");
+        caret.className = `tree-caret ${folder.collapsed ? "is-closed" : "is-open"}`;
+        caret.setAttribute("aria-hidden", "true");
+
+        const label = document.createElement("span");
+        label.className = "tree-label";
+        label.textContent = folder.name;
+
+        const meta = document.createElement("span");
+        meta.className = "tree-meta";
+        meta.textContent = String(folder.tabIds.length);
+
+        toggle.append(caret, label, meta);
         section.appendChild(toggle);
 
         const children = document.createElement("div");
@@ -74,6 +87,7 @@ function renderExplorer() {
 }
 
 function updateCaret(caret, isClosed) {
+    if (!caret) return;
     caret.classList.toggle("is-closed", isClosed);
     caret.classList.toggle("is-open", !isClosed);
 }
@@ -83,65 +97,77 @@ function createTreeItem(tab) {
     button.type = "button";
     button.className = "tree-item";
     button.dataset.tabActivate = tab.id;
+    button.draggable = true;
     if (tab.id === state.activeTabId) {
         button.classList.add("is-active");
     }
-    button.innerHTML = `
-        <span class="tree-label">${tab.name}</span>
-    `;
+    const label = document.createElement("span");
+    label.className = "tree-label";
+    label.textContent = tab.name;
+    button.appendChild(label);
     return button;
 }
 
-function renderTabs() {
-    refs.tabStrip.innerHTML = "";
-    state.tabs.forEach((tab) => {
-        const tabButton = document.createElement("button");
-        tabButton.type = "button";
-        tabButton.className = "tab-chip";
-        tabButton.dataset.tabActivate = tab.id;
-        if (tab.id === state.activeTabId) {
-            tabButton.classList.add("is-active");
+function renderViewer() {
+    // Xóa các phần tử không còn trong state
+    const currentInstanceIds = new Set(state.canvasItems.map(item => item.instanceId));
+    const renderedItems = refs.canvasContainer.querySelectorAll(".canvas-item");
+    renderedItems.forEach(el => {
+        if (!currentInstanceIds.has(el.dataset.instanceId)) {
+            el.remove();
+        }
+    });
+
+    // Render hoặc cập nhật
+    state.canvasItems.forEach(item => {
+        let el = refs.canvasContainer.querySelector(`[data-instance-id="${item.instanceId}"]`);
+        if (!el) {
+            const tab = getTab(item.tabId);
+            if (!tab) return;
+
+            el = document.createElement("div");
+            el.className = "canvas-item";
+            el.dataset.instanceId = item.instanceId;
+
+            const img = document.createElement("img");
+            img.src = tab.url;
+            img.alt = tab.name;
+            img.draggable = false;
+            el.appendChild(img);
+
+            // Tạo các handle resize
+            ["nw","ne","sw","se","n","s","e","w"].forEach(pos => {
+                const h = document.createElement("div");
+                h.className = `resize-handle ${pos}`;
+                h.dataset.handle = pos;
+                el.appendChild(h);
+            });
+
+            refs.canvasContainer.appendChild(el);
         }
 
-        const title = document.createElement("span");
-        title.className = "tab-title";
-        title.textContent = tab.name;
-        tabButton.appendChild(title);
+        el.classList.toggle("is-active", item.instanceId === state.activeInstanceId);
 
-        const closeButton = document.createElement("button");
-        closeButton.type = "button";
-        closeButton.className = "tab-close";
-        closeButton.dataset.tabClose = tab.id;
-        closeButton.textContent = text("BTN_CLOSE_TAB");
-        tabButton.appendChild(closeButton);
-
-        refs.tabStrip.appendChild(tabButton);
+        // Dùng transform để đồng bộ với app.js
+        el.style.width = `${item.width}px`;
+        el.style.height = `${item.height}px`;
+        el.style.transform = `translate(${item.x}px, ${item.y}px)`;
+        el.style.zIndex = item.zIndex;
+        // Xóa left/top cũ nếu có từ phiên bản trước
+        el.style.left = "";
+        el.style.top = "";
     });
 }
 
-function renderViewer() {
-    const activeTab = getActiveTab();
-    if (!activeTab) {
-        refs.activeImage.removeAttribute("src");
-        refs.activeImage.alt = "";
-        return;
-    }
-
-    refs.activeImage.src = activeTab.url;
-    refs.activeImage.alt = activeTab.name;
-}
-
 function updateToolbarActions() {
-    const hasTabs = state.tabs.length > 0;
-    refs.saveAsAction.disabled = !hasTabs;
+    const hasItems = state.canvasItems.length > 0;
+    if (refs.saveAsAction) refs.saveAsAction.disabled = !hasItems;
 }
 
 function updateEmptyStates() {
     const hasItems = state.folders.length > 0 || state.looseTabIds.length > 0;
-    const hasTabs = state.tabs.length > 0;
+    const hasCanvasItems = state.canvasItems.length > 0;
 
-    refs.explorerEmpty.hidden = hasItems;
-    refs.tabStrip.hidden = !hasTabs;
-    refs.viewerEmpty.hidden = hasTabs;
-    refs.viewerStage.hidden = !hasTabs;
+    if (refs.explorerEmpty) refs.explorerEmpty.hidden = hasItems;
+    if (refs.dropZoneContent) refs.dropZoneContent.hidden = hasCanvasItems;
 }

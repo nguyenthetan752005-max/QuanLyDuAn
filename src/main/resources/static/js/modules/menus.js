@@ -2,7 +2,10 @@ export function setupMenus() {
     document.querySelectorAll("[data-menu-toggle]").forEach((button) => {
         button.addEventListener("click", (event) => {
             event.stopPropagation();
-            const menu = document.getElementById(button.dataset.menuToggle);
+            const menuId = button.dataset.menuToggle;
+            const menu = menuId ? document.getElementById(menuId) : null;
+            if (!menu) return;
+
             const willOpen = menu.hidden;
 
             closeAllMenus();
