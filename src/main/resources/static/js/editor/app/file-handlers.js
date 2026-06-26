@@ -109,25 +109,41 @@ export function setupDragAndDrop() {
         const isStock = event.dataTransfer.getData("application/lily-stock") === "true";
 
         if (isStock && dataText) {
-            const img = new Image();
-            img.crossOrigin = 'anonymous'; // Important for CORS
-            img.onload = () => {
-                const id = 'stock_' + Date.now();
-                state.items.push({
-                    instanceId: id,
-                    type: 'image',
-                    src: dataText,
-                    x: x - (img.width > 300 ? 150 : Math.floor(img.width / 2)),
-                    y: y - (img.height > 300 ? 150 : Math.floor(img.height / 2)),
-                    width: img.width > 300 ? 300 : img.width,
-                    height: img.width > 300 ? Math.floor(img.height * (300 / img.width)) : img.height,
-                    rotation: 0,
-                    zIndex: state.items.length
-                });
-                state.activeInstanceId = id;
-                renderApp();
-            };
-            img.src = dataText;
+            (async () => {
+                try {
+                    const response = await fetch(dataText);
+                    if (!response.ok) throw new Error("Không thể tải ảnh Stock");
+                    const blob = await response.blob();
+                    
+                    const aiManager = await import('../modules/ai/aiManager.js');
+                    
+                    aiManager.showSaveModal(blob, "stock_image_" + Date.now() + ".jpg", (newObjectUrl) => {
+                        const img = new Image();
+                        img.crossOrigin = 'anonymous';
+                        img.onload = () => {
+                            const id = 'stock_' + Date.now();
+                            state.canvasItems.push({
+                                instanceId: id,
+                                type: 'image',
+                                src: newObjectUrl,
+                                x: x - (img.width > 300 ? 150 : Math.floor(img.width / 2)),
+                                y: y - (img.height > 300 ? 150 : Math.floor(img.height / 2)),
+                                width: img.width > 300 ? 300 : img.width,
+                                height: img.width > 300 ? Math.floor(img.height * (300 / img.width)) : img.height,
+                                naturalWidth: img.width,
+                                naturalHeight: img.height,
+                                rotation: 0,
+                                zIndex: state.canvasItems.length
+                            });
+                            state.activeInstanceId = id;
+                            renderApp();
+                        };
+                        img.src = newObjectUrl;
+                    });
+                } catch (err) {
+                    console.error("Lỗi kéo thả Stock:", err);
+                }
+            })();
             return;
         }
 
@@ -139,26 +155,45 @@ export function setupDragAndDrop() {
     });
 
     // Handle click to insert stock image
-    window.addEventListener('insertStockImage', (e) => {
+    window.addEventListener('insertStockImage', async (e) => {
         const url = e.detail.url;
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => {
-            const id = 'stock_' + Date.now();
-            state.items.push({
-                instanceId: id,
-                type: 'image',
-                src: url,
-                x: 100,
-                y: 100,
-                width: img.width > 300 ? 300 : img.width,
-                height: img.width > 300 ? Math.floor(img.height * (300 / img.width)) : img.height,
-                rotation: 0,
-                zIndex: state.items.length
+        try {
+            // Tải ảnh về dạng Blob
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("Không thể tải ảnh Stock");
+            const blob = await response.blob();
+            
+            // Lấy module aiManager (vì showSaveModal đang export ở đó)
+            const aiManager = await import('../modules/ai/aiManager.js');
+            
+            // Gọi modal lưu
+            aiManager.showSaveModal(blob, "stock_image_" + Date.now() + ".jpg", (newObjectUrl) => {
+                // Sau khi lưu thành công, thêm vào canvas
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => {
+                    const id = 'stock_' + Date.now();
+                    state.canvasItems.push({
+                        instanceId: id,
+                        type: 'image',
+                        src: newObjectUrl,
+                        x: 100,
+                        y: 100,
+                        width: img.width > 300 ? 300 : img.width,
+                        height: img.width > 300 ? Math.floor(img.height * (300 / img.width)) : img.height,
+                        naturalWidth: img.width,
+                        naturalHeight: img.height,
+                        rotation: 0,
+                        zIndex: state.canvasItems.length
+                    });
+                    state.activeInstanceId = id;
+                    renderApp();
+                };
+                img.src = newObjectUrl;
             });
-            state.activeInstanceId = id;
-            renderApp();
-        };
-        img.src = url;
+        } catch (err) {
+            console.error("Lỗi thêm ảnh Stock:", err);
+            alert("Lỗi tải ảnh Stock");
+        }
     });
 }

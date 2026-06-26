@@ -64,21 +64,23 @@ public class ProjectServiceImpl implements ProjectService {
             String[] parts = base64Data.split(",");
             String data = parts.length > 1 ? parts[1] : parts[0];
             byte[] imageBytes = java.util.Base64.getDecoder().decode(data);
-            String filename = "proj_" + java.util.UUID.randomUUID().toString() + ".png";
+            
+            String filename;
+            if (currentUrl != null && currentUrl.startsWith("/uploads/proj_")) {
+                filename = currentUrl.substring("/uploads/".length());
+                if (filename.contains("?")) {
+                    filename = filename.substring(0, filename.indexOf("?"));
+                }
+            } else {
+                filename = "proj_" + java.util.UUID.randomUUID().toString() + ".png";
+            }
+            
             java.nio.file.Path rootLocation = java.nio.file.Paths.get(uploadDir);
             java.nio.file.Files.createDirectories(rootLocation);
             java.nio.file.Path outputFile = rootLocation.resolve(filename);
             java.nio.file.Files.write(outputFile, imageBytes);
             
-            // Xóa file cũ nếu có
-            if (currentUrl != null && currentUrl.startsWith("/uploads/")) {
-                try {
-                    String oldFilename = currentUrl.substring("/uploads/".length());
-                    storageService.delete(oldFilename);
-                } catch (Exception ignored) {}
-            }
-            
-            return "/uploads/" + filename;
+            return "/uploads/" + filename + "?t=" + System.currentTimeMillis();
         } catch (Exception e) {
             log.error("Lỗi khi lưu thumbnail project", e);
             return currentUrl;

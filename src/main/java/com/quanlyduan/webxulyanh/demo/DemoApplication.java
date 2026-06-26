@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAsync
 @EnableScheduling
 @EnableMongoAuditing
+@org.springframework.context.annotation.PropertySource(value = "classpath:secret.properties", ignoreResourceNotFound = true)
 public class DemoApplication {
 
     public static void main(String[] args) {

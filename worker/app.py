@@ -9,6 +9,7 @@ import numpy as np
 from rembg import remove, new_session
 from PIL import Image
 import io
+import mediapipe as mp
 
 app = FastAPI()
 logging.basicConfig(level=logging.INFO)
@@ -64,14 +65,14 @@ async def start_download(req: DownloadRequest, background_tasks: BackgroundTasks
 # Initialize u2netp session once for performance (CPU friendly)
 rembg_session = new_session("u2netp")
 
-# Use absolute path for cascade to ensure it loads
-cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
-face_cascade = cv2.CascadeClassifier(cascade_path)
+# Initialize MediaPipe Face Detection
+mp_face_detection = mp.solutions.face_detection
+face_detection_model = mp_face_detection.FaceDetection(model_selection=1, min_detection_confidence=0.5)
 
 @app.post("/api/worker/remove-bg")
-async def remove_bg(image: UploadFile = File(...)):
+def remove_bg(image: UploadFile = File(...)):
     try:
-        content = await image.read()
+        content = image.file.read()
         input_image = Image.open(io.BytesIO(content))
         
         output_image = remove(input_image, session=rembg_session)
@@ -86,32 +87,46 @@ async def remove_bg(image: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/worker/detect-faces")
-async def detect_faces(image: UploadFile = File(...)):
+def detect_faces(image: UploadFile = File(...)):
     try:
-        content = await image.read()
+        content = image.file.read()
         data = np.frombuffer(content, dtype=np.uint8)
         img = cv2.imdecode(data, cv2.IMREAD_COLOR)
         
         if img is None:
             raise HTTPException(status_code=400, detail="Invalid image")
              
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         
-        faces = face_cascade.detectMultiScale(
-            gray, 
-            scaleFactor=1.1, 
-            minNeighbors=5, 
-            minSize=(30, 30)
-        )
+        # Use MediaPipe to detect faces
+        mp_results = face_detection_model.process(img_rgb)
         
         results = []
-        for (x, y, w, h) in faces:
-            results.append({
-                "x": int(x),
-                "y": int(y),
-                "width": int(w),
-                "height": int(h)
-            })
+        if mp_results.detections:
+            h_img, w_img, _ = img.shape
+            for detection in mp_results.detections:
+                bboxC = detection.location_data.relative_bounding_box
+                
+                # Bounding box values are relative, so multiply by image dimensions
+                x = int(bboxC.xmin * w_img)
+                y = int(bboxC.ymin * h_img)
+                w = int(bboxC.width * w_img)
+                h = int(bboxC.height * h_img)
+                
+                # Add some padding to cover the whole head properly
+                pad_w = int(w * 0.1)
+                pad_h = int(h * 0.1)
+                x = max(0, x - pad_w)
+                y = max(0, y - pad_h)
+                w = min(w_img - x, w + 2 * pad_w)
+                h = min(h_img - y, h + 2 * pad_h)
+
+                results.append({
+                    "x": x,
+                    "y": y,
+                    "width": w,
+                    "height": h
+                })
             
         return {"faces": results}
     except Exception as e:

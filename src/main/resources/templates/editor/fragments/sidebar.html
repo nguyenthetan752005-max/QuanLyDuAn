@@ -3,7 +3,7 @@
 <body>
 <aside class="sidebar panel" th:fragment="sidebar">
     <!-- Explorer Panel Content -->
-    <div id="explorer-tab-content" class="explorer-tab-content" style="display: flex; flex-direction: column; height: 100%;">
+    <div id="explorer-tab-content" class="explorer-tab-content" style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
         <!-- Panel Header -->
         <div class="panel-header explorer-panel-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.08));">
             <span class="panel-kicker">Kho lưu trữ</span>
@@ -25,7 +25,7 @@
         </div>
 
         <!-- Stock Container (Hidden by default) -->
-        <div id="stock-container-sidebar" style="display: none; flex-direction: column; height: 100%; padding: 0 12px 12px;">
+        <div id="stock-container-sidebar" style="display: none; flex-direction: column; flex: 1; min-height: 0; padding: 0 12px 12px;">
             <div style="margin-bottom: 10px;">
                 <input type="text" id="stock-search-input" placeholder="Tìm kiếm hình ảnh (VD: nature, city)..." style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-strong); background: var(--bg); color: var(--text); font-size: 12px;">
             </div>
@@ -34,7 +34,7 @@
                 <p style="font-size: 11px; color: var(--text-muted);">Đang tải ảnh...</p>
             </div>
             <!-- Masonry Grid for Stock Images -->
-            <div id="stock-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; overflow-y: auto; align-content: start;">
+            <div id="stock-grid" style="columns: 2; column-gap: 6px; overflow-y: auto; flex: 1; min-height: 0; padding-bottom: 20px;">
             </div>
         </div>
 

@@ -1,5 +1,6 @@
 import { state, updateCanvasItem } from "../../state.js";
 import { renderApp } from "../index.js";
+import { removeBackground, detectAndBlurFaces } from "../../ai/aiManager.js";
 import { renderViewer } from "../viewer.js";
 import { FILTER_CONFIG, FILTER_PRESETS, getDefaultFilters } from "../../image-editor.js";
 import { refs } from "../../dom.js";
@@ -99,6 +100,48 @@ export function renderShapeControls(item, controls) {
         radiusWrapper.appendChild(radiusInput);
         controls.appendChild(radiusWrapper);
     }
+    
+    // Shape Type
+    const shapeTypeWrapper = document.createElement('div');
+    shapeTypeWrapper.className = 'edit-control-row';
+    shapeTypeWrapper.innerHTML = `<label class="edit-control-label">Hình dạng</label>`;
+    const shapeTypeSelect = document.createElement('select');
+    shapeTypeSelect.className = 'edit-control-select';
+    shapeTypeSelect.style.width = '100%';
+    shapeTypeSelect.innerHTML = `
+        <option value="rectangle" ${item.shapeType === 'rectangle' ? 'selected' : ''}>Chữ nhật</option>
+        <option value="circle" ${item.shapeType === 'circle' ? 'selected' : ''}>Tròn / Ellipse</option>
+    `;
+    shapeTypeSelect.addEventListener('change', (e) => {
+        item.shapeType = e.target.value;
+        updateCanvasItem(item.instanceId, { shapeType: e.target.value }, true);
+        renderApp();
+    });
+    shapeTypeWrapper.appendChild(shapeTypeSelect);
+    controls.appendChild(shapeTypeWrapper);
+
+    // Backdrop Blur
+    const blurWrapper = document.createElement('div');
+    blurWrapper.className = 'edit-control-row';
+    blurWrapper.innerHTML = `<label class="edit-control-label-flex">Kính mờ (Blur) <span>${item.backdropBlur || 0}px</span></label>`;
+    const blurInput = document.createElement('input');
+    blurInput.type = 'range';
+    blurInput.min = '0';
+    blurInput.max = '100';
+    blurInput.value = item.backdropBlur || 0;
+    blurInput.className = 'edit-control-range';
+    blurInput.addEventListener('input', (e) => {
+        const val = Number(e.target.value);
+        item.backdropBlur = val;
+        renderViewer();
+        blurWrapper.querySelector('span').textContent = `${val}px`;
+    });
+    blurInput.addEventListener('change', (e) => {
+        updateCanvasItem(item.instanceId, { backdropBlur: Number(e.target.value) }, true);
+        renderApp();
+    });
+    blurWrapper.appendChild(blurInput);
+    controls.appendChild(blurWrapper);
 }
 
 export function renderStickerControls(item, controls) {
@@ -117,13 +160,11 @@ export function renderStickerControls(item, controls) {
     controls.appendChild(stickerTextWrapper);
 }
 
-import { removeBackground, detectAndBlurFaces } from "../ai/aiManager.js";
-
 export function renderEditControls(item, controls) {
     // ----------------------------------------------------
     // AI Actions
     // ----------------------------------------------------
-    if (item.type === 'image' || item.type === 'video') {
+    if (item.type === 'image') {
         const aiLabel = document.createElement('label');
         aiLabel.className = 'edit-control-label-bold';
         aiLabel.innerHTML = '<span style="color: #BB86FC;">✨ Tác vụ AI</span>';
@@ -162,6 +203,23 @@ export function renderEditControls(item, controls) {
         aiGrid.appendChild(btnRemoveBg);
         aiGrid.appendChild(btnBlurFace);
         controls.appendChild(aiGrid);
+        
+        const btnApplyBlur = document.createElement('button');
+        btnApplyBlur.type = 'button';
+        btnApplyBlur.className = 'dialog-button confirm-btn';
+        btnApplyBlur.style.padding = '8px';
+        btnApplyBlur.style.fontSize = '12px';
+        btnApplyBlur.style.width = '100%';
+        btnApplyBlur.style.marginBottom = '16px';
+        btnApplyBlur.style.background = 'rgba(255, 255, 255, 0.2)';
+        btnApplyBlur.style.border = '1px solid rgba(255, 255, 255, 0.4)';
+        btnApplyBlur.innerHTML = '💾 Áp dụng & Lưu ảnh che mặt';
+        btnApplyBlur.addEventListener('click', () => {
+            import("../../ai/aiManager.js").then(m => {
+                if (m.flattenAndSaveBlur) m.flattenAndSaveBlur(item);
+            });
+        });
+        controls.appendChild(btnApplyBlur);
 
         const hrAi = document.createElement('hr');
         hrAi.className = 'edit-control-divider';

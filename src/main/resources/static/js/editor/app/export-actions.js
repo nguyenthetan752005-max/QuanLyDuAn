@@ -8,6 +8,94 @@ let activeProcessingId = null;
 let activeIntervalId = null;
 let wasAutosaveEnabledBeforeExport = true;
 
+async function prepareArtboardForExport(artboard) {
+    const originalStates = [];
+    const blurShapes = state.canvasItems.filter(s => s.type === 'shape' && s.backdropBlur > 0);
+    
+    if (blurShapes.length === 0) return originalStates;
+    
+    // Hide the DOM elements for these shapes
+    blurShapes.forEach(shape => {
+        const shapeEl = artboard.querySelector(`[data-instance-id="${shape.instanceId}"]`);
+        if (shapeEl) {
+            originalStates.push({ el: shapeEl, type: 'display', value: shapeEl.style.display });
+            shapeEl.style.display = 'none';
+        }
+    });
+
+    // For each image in the canvas, check if any blur shapes overlap it
+    const images = state.canvasItems.filter(i => i.type === 'image' || i.type === 'video');
+    
+    for (const item of images) {
+        const overlappingShapes = blurShapes.filter(shape => {
+            return !(shape.x > item.x + item.width || 
+                     shape.x + shape.width < item.x || 
+                     shape.y > item.y + item.height || 
+                     shape.y + shape.height < item.y) &&
+                   (shape.zIndex || 0) > (item.zIndex || 0);
+        });
+        
+        if (overlappingShapes.length > 0) {
+            const imgEl = artboard.querySelector(`[data-instance-id="${item.instanceId}"] img, [data-instance-id="${item.instanceId}"] video`);
+            if (!imgEl) continue;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = item.width;
+            canvas.height = item.height;
+            const ctx = canvas.getContext('2d');
+            
+            try {
+                ctx.drawImage(imgEl, 0, 0, item.width, item.height);
+                
+                overlappingShapes.forEach(shape => {
+                    ctx.save();
+                    ctx.beginPath();
+                    
+                    const localX = shape.x - item.x;
+                    const localY = shape.y - item.y;
+                    const localW = shape.width;
+                    const localH = shape.height;
+
+                    if (shape.shapeType === 'circle') {
+                        ctx.ellipse(localX + localW/2, localY + localH/2, localW/2, localH/2, 0, 0, 2*Math.PI);
+                    } else {
+                        ctx.rect(localX, localY, localW, localH);
+                    }
+                    
+                    ctx.clip();
+                    ctx.filter = `blur(${shape.backdropBlur}px)`;
+                    ctx.drawImage(imgEl, 0, 0, item.width, item.height);
+                    ctx.restore();
+                });
+                
+                const dataUrl = canvas.toDataURL('image/png');
+                originalStates.push({ el: imgEl, type: 'src', value: imgEl.src });
+                
+                // Wrap image onload in a promise to ensure it renders before domtoimage runs
+                await new Promise((resolve) => {
+                    const tempImg = new Image();
+                    tempImg.onload = () => {
+                        imgEl.src = dataUrl;
+                        resolve();
+                    };
+                    tempImg.onerror = resolve;
+                    tempImg.src = dataUrl;
+                });
+            } catch (e) {
+                console.error("Failed to pre-render blur for image", e);
+            }
+        }
+    }
+    return originalStates;
+}
+
+function restoreArtboardAfterExport(originalStates) {
+    originalStates.forEach(s => {
+        if (s.type === 'display') s.el.style.display = s.value;
+        if (s.type === 'src') s.el.src = s.value;
+    });
+}
+
 export function updateExportInfo() {
     if (!refs.exportScale || !refs.exportInfo) return;
     const scale = parseFloat(refs.exportScale.value) || 1;
@@ -65,6 +153,7 @@ export async function openExportDialog() {
         return;
     }
     
+    let originalStates = [];
     try {
         await new Promise(r => setTimeout(r, 100));
 
@@ -72,10 +161,11 @@ export async function openExportDialog() {
             throw new Error("Thư viện domtoimage chưa được tải. Vui lòng tải lại trang (Ctrl + F5).");
         }
 
+        originalStates = await prepareArtboardForExport(artboard);
+
         const dataUrl = await window.domtoimage.toPng(artboard, {
             width: state.projectConfig.width,
             height: state.projectConfig.height,
-            cacheBust: true,
             style: {
                 transform: 'scale(1)',
                 transformOrigin: 'top left',
@@ -101,6 +191,7 @@ export async function openExportDialog() {
         }
         setStatus("Sẵn sàng xuất ảnh (không có xem trước).");
     } finally {
+        restoreArtboardAfterExport(originalStates);
         artboard.classList.remove("is-exporting");
     }
     
@@ -340,11 +431,13 @@ export async function downloadExportedImage() {
     
     await new Promise(r => setTimeout(r, 120));
     
+    let originalStates = [];
     try {
+        originalStates = await prepareArtboardForExport(artboard);
+
         const options = {
             width: state.projectConfig.width * scale,
             height: state.projectConfig.height * scale,
-            cacheBust: true,
             style: {
                 transform: `scale(${scale})`,
                 transformOrigin: 'top left',
@@ -390,6 +483,7 @@ export async function downloadExportedImage() {
         console.error("Lỗi khi xuất thiết kế:", error);
         showWarning(`Không thể tải ảnh xuống. Chi tiết lỗi: ${error.message || error}. Hãy chắc chắn rằng bạn không tải ảnh từ máy chủ khác chưa được cấp phép CORS.`);
     } finally {
+        restoreArtboardAfterExport(originalStates);
         artboard.classList.remove("is-exporting");
         if (refs.exportDownloadBtn) {
             refs.exportDownloadBtn.disabled = false;

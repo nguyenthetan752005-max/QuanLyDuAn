@@ -51,11 +51,14 @@ async function fetchStockImages(query) {
             wrapper.style.borderRadius = '4px';
             wrapper.style.overflow = 'hidden';
             wrapper.style.marginBottom = '6px';
+            wrapper.style.breakInside = 'avoid';
+            wrapper.style.display = 'inline-block';
+            wrapper.style.width = '100%';
             
             // Allow dragging onto canvas
             wrapper.draggable = true;
             wrapper.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('text/plain', img.urls.regular);
+                e.dataTransfer.setData('text/plain', img.urls.full);
                 e.dataTransfer.setData('application/lily-stock', 'true');
                 wrapper.style.opacity = '0.5';
             });
@@ -66,13 +69,15 @@ async function fetchStockImages(query) {
             const imageEl = document.createElement('img');
             imageEl.src = img.urls.thumb;
             imageEl.style.width = '100%';
+            imageEl.style.height = 'auto'; // Prevent squishing
             imageEl.style.display = 'block';
+            imageEl.style.objectFit = 'contain';
             imageEl.loading = 'lazy';
             
             // Add click to insert feature
             wrapper.addEventListener('click', () => {
                 // Dispatch a custom event that editor can listen to
-                window.dispatchEvent(new CustomEvent('insertStockImage', { detail: { url: img.urls.regular } }));
+                window.dispatchEvent(new CustomEvent('insertStockImage', { detail: { url: img.urls.full } }));
             });
             
             wrapper.appendChild(imageEl);

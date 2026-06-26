@@ -332,11 +332,25 @@ export function renderViewer() {
                 stickerDiv.className = "sticker-content";
                 el.appendChild(stickerDiv);
             } else {
-                const tab = getTab(item.tabId);
-                if (!tab) return;
+                let imgUrl = item.src;
+                let isVideo = false;
+                let isAudio = false;
+                let name = "Image";
 
-                const isVideo = isVideoTab(tab);
-                const isAudio = isAudioTab(tab);
+                if (item.tabId) {
+                    const tab = getTab(item.tabId);
+                    if (tab) {
+                        if (!imgUrl) {
+                            imgUrl = tab.localUrl || getCorsBypassUrl(tab.url);
+                        }
+                        isVideo = isVideoTab(tab);
+                        isAudio = isAudioTab(tab);
+                        name = tab.name || "Media";
+                    }
+                }
+                
+                if (!imgUrl) return;
+
                 if (isVideo) {
                     const videoWrapper = document.createElement("div");
                     videoWrapper.className = "image-wrapper video-wrapper";
@@ -344,7 +358,7 @@ export function renderViewer() {
                     const video = document.createElement("video");
                     video.preload = "auto";
                     video.crossOrigin = "anonymous";
-                    video.src = tab.localUrl || getCorsBypassUrl(tab.url);
+                    video.src = imgUrl;
                     video.muted = false;
                     video.loop = true;
                     video.playsInline = true;
@@ -359,7 +373,7 @@ export function renderViewer() {
                     const audio = document.createElement("audio");
                     audio.preload = "auto";
                     audio.crossOrigin = "anonymous";
-                    audio.src = tab.localUrl || getCorsBypassUrl(tab.url);
+                    audio.src = imgUrl;
                     audio.muted = false;
                     audio.loop = true;
                     audioWrapper.appendChild(audio);
@@ -371,8 +385,8 @@ export function renderViewer() {
 
                     const img = document.createElement("img");
                     img.crossOrigin = "anonymous";
-                    img.src = tab.localUrl || getCorsBypassUrl(tab.url);
-                    img.alt = tab.name;
+                    img.src = imgUrl;
+                    img.alt = name;
                     img.draggable = false;
                     imgWrapper.appendChild(img);
                     el.appendChild(imgWrapper);
@@ -505,6 +519,14 @@ export function renderViewer() {
                         shapeDiv.style.borderRadius = `${item.cornerRadius || 0}px`;
                     }
                 }
+                
+                if (item.backdropBlur > 0) {
+                    shapeDiv.style.backdropFilter = `blur(${item.backdropBlur}px)`;
+                    shapeDiv.style.webkitBackdropFilter = `blur(${item.backdropBlur}px)`;
+                } else {
+                    shapeDiv.style.backdropFilter = '';
+                    shapeDiv.style.webkitBackdropFilter = '';
+                }
             }
         } else if (item.type === 'sticker') {
             const stickerDiv = el.querySelector(".sticker-content");
@@ -517,6 +539,19 @@ export function renderViewer() {
             if (imgEl && item.filters && item.transform) {
                 imgEl.style.filter = getFilterCSSString(item.filters);
                 imgEl.style.transform = `scaleX(${item.transform.flipX}) scaleY(${item.transform.flipY})`;
+                
+                // Update src if it was changed by AI or other tools
+                if (item.src && imgEl.src !== item.src) {
+                    // Check if it's not a blob url or if it is a blob url that doesn't match
+                    if (item.src.startsWith('blob:') && imgEl.src !== item.src) {
+                        imgEl.src = item.src;
+                    } else if (!item.src.startsWith('blob:')) {
+                         // Simple comparison for non-blob urls
+                         if (!imgEl.src.endsWith(item.src)) {
+                             imgEl.src = item.src;
+                         }
+                    }
+                }
                 
                 if (item.crop) {
                     const scaleX = item.width / item.crop.width;
