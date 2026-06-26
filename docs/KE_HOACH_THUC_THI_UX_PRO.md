@@ -213,48 +213,43 @@ Giúp người dùng không phải "edit mù" khi cắt ghép video và âm than
 
 ---
 
-## 🚀 PHASE 4: TÍNH NĂNG CAO CẤP & WOW FACTOR (AI & NỘI DUNG)
-*Mục tiêu: Tạo ra các điểm nhấn khác biệt cho Editor.*
+## 🚀 PHASE 4: TÍNH NĂNG CAO CẤP & WOW FACTOR (AI & NỘI DUNG) - TINH GIẢN (CPU / 3 HOURS LITE)
+*Mục tiêu: Đạt Wow-factor cao nhất, đảm bảo ứng dụng chạy mượt mà trên CPU mà không bị treo trong thời gian siêu giới hạn.*
 
-### 4.1. Tách Nền AI (Mã A8)
+### 4.1. Tách Nền AI (Mã A8) - Ưu tiên Cao nhất
 *   **Worker Python (`worker/app.py`):**
     *   Mở endpoint `POST /api/worker/remove-bg`.
-    *   Cài đặt thư viện `rembg`. Nhận hình ảnh, chạy model AI xóa nền và trả về định dạng PNG trong suốt.
+    *   Cài đặt thư viện `rembg`. **Bắt buộc sử dụng model `u2netp` (lite)** thay vì `u2net` để đảm bảo thời gian xử lý trên CPU rút ngắn từ ~10s xuống 1-2s.
 *   **Back-end (Spring Boot):**
-    *   Tạo Service làm cầu nối, gửi ảnh sang Worker xử lý, sau đó lưu file kết quả như một Asset mới.
-*   **Front-end:**
-    *   Gắn nút "Xóa nền AI" (Kèm icon sao lấp lánh) trên thanh công cụ khi user chọn một layer Ảnh.
+    *   Tạo Service gửi ảnh sang Worker xử lý. Tạm thời bỏ qua việc check dung lượng/tín dụng. Trả kết quả ảnh gốc thành PNG trong suốt.
+*   **Front-end (Trải nghiệm UI/UX Chuyên nghiệp):**
+    *   **Thao tác kích hoạt:** Khi người dùng click chọn một Layer Hình ảnh trên Canvas, thanh Toolbar phía trên (hoặc Properties Panel bên phải) sẽ tự động hiện ra một nút nổi bật: **"✨ Xóa nền AI"** (có icon lấp lánh hoặc màu gradient thu hút).
+    *   **Hiệu ứng đang xử lý:** Ngay khi bấm, vô hiệu hóa (disable) nút đó. Phủ một lớp overlay mờ lên bức ảnh đang chọn trên Canvas kèm một Spinner xoay tròn và dòng chữ *"✨ AI đang tách nền..."*.
+    *   **Hoàn thành:** Khi có kết quả, ảnh cũ tự động biến mất, thay bằng ảnh PNG trong suốt với hiệu ứng fade-in mượt mà, giữ nguyên tọa độ và kích thước ban đầu.
 
-### 4.2. Quản lý Thư viện Nhạc / Sound Effects (Mã B6)
-*   **Back-end & Database:**
-    *   Thêm logic để phân biệt Asset cá nhân (Private) và Asset hệ thống (Public).
-    *   Chuẩn bị sẵn một bộ sưu tập nhạc nền / hiệu ứng âm thanh miễn phí bản quyền seed vào DB.
-*   **Front-end:**
-    *   Tại menu trái (Sidebar) của Editor, thêm tab **"Âm thanh"**. Cho phép người dùng duyệt, nghe thử và kéo thả thẳng đoạn nhạc đó vào Timeline.
+### 4.2. Tích hợp Thư viện Stock API (Unsplash) - Ưu tiên Cao
+*Thay thế cho việc tự xây dựng thư viện Nhạc/Video tốn thời gian ở phương án cũ.*
+*   **Back-end:** Tạo proxy endpoint gọi đến API miễn phí của Unsplash để lấy ảnh.
+*   **Front-end (Trải nghiệm UI/UX Chuyên nghiệp):**
+    *   **Thao tác kích hoạt:** Mở thêm một Tab **"Thư viện Ảnh (Stock)"** ở Sidebar bên trái (cạnh nút Quản lý tệp tin).
+    *   **Giao diện:** Tab này chứa một thanh Search box và một lưới (Grid) hiển thị ảnh dạng Masonry (giống Pinterest). Khi cuộn chuột sẽ tự động tải thêm (Infinite Scroll).
+    *   **Tương tác Kéo - Thả (Drag & Drop):** Người dùng chỉ cần dùng chuột nắm kéo (drag) một bức ảnh từ lưới Sidebar và thả (drop) thẳng vào Canvas. Ảnh sẽ tự động được tải ngầm và chèn vào dự án như một Layer mới mà không cần thao tác Download/Upload thủ công.
 
-### 4.3. Dò Tìm & Theo Dõi Khuôn Mặt AI (Face Tracking & Obfuscation)
+### 4.3. Nhận diện Khuôn mặt trên Ảnh tĩnh (Mã A9) - Ưu tiên Trung bình
+*Bỏ qua Video Face Tracking vì sẽ làm crash/lag CPU máy trạm. Thay bằng nhận diện ảnh tĩnh.*
 *   **Worker Python (`worker/app.py`):**
-    *   Tích hợp mô hình Computer Vision (như `OpenCV` Haar Cascades hoặc `MediaPipe` Face Detection).
-    *   Mở endpoint nhận đầu vào là hình ảnh (hoặc khung hình video), trả về tọa độ (bounding box) của các khuôn mặt xuất hiện trong hình.
-*   **Back-end (Spring Boot):** Tạo service làm trung gian gọi Worker để lấy tọa độ khuôn mặt.
-*   **Front-end:**
-    *   Cung cấp tính năng "Che khuôn mặt" trên thanh công cụ ngữ cảnh.
-    *   Dựa vào tọa độ trả về từ AI, tự động áp dụng filter `blur` (làm mờ), pixelate (đóng pixel) hoặc tự động chèn một nhãn dán (Sticker/Icon/Emoji) đè lên vị trí khuôn mặt đó trên Canvas/Video.
+    *   Sử dụng `OpenCV` (Haar Cascades) hoặc `MediaPipe` Face Detection.
+    *   Nhận bức ảnh tĩnh, trả về mảng tọa độ (X, Y, Width, Height) của các khuôn mặt xuất hiện.
+*   **Front-end (Trải nghiệm UI/UX Chuyên nghiệp):**
+    *   **Thao tác kích hoạt:** Tương tự như Xóa nền, khi chọn một Layer Ảnh, thanh Toolbar hiện thêm nút **"🕵️‍♂️ Che khuôn mặt AI"**.
+    *   **Tương tác:** Bấm vào nút này, hệ thống hiện loading. Trả kết quả về, Canvas sẽ tự động sinh ra các Layer con dạng Hình vuông (màu đen, hoặc hiệu ứng mờ Blur) che chính xác lên các tọa độ khuôn mặt vừa tìm được. Người dùng có thể tự do di chuyển hoặc xóa các lớp che này nếu AI nhận diện nhầm.
 
-### 4.4. Tích hợp Thư viện Stock API (Unsplash / Pexels)
-*   **Back-end:** Tạo các endpoints proxy gọi đến API của Unsplash/Pexels/Pixabay để tìm kiếm hình ảnh và video stock miễn phí.
-*   **Front-end:** Trong Sidebar, mở thêm Tab "Thư viện Stock", cho phép người dùng tìm kiếm theo từ khóa và kéo thả trực tiếp tài nguyên đó vào Canvas hoặc Timeline mà không cần rời khỏi ứng dụng để tải về.
-
-### 4.5. Cơ chế Xử lý & Quản lý Tài nguyên AI chung
-Vì các tính năng AI (Xóa nền, Dò tìm khuôn mặt...) tiêu tốn nhiều tài nguyên xử lý và lưu trữ, hệ thống áp dụng cơ chế chuẩn sau:
-1.  **Kiểm tra Quota (Test Mode):** Tạm thời giả lập (Mock) việc kiểm tra số dư tín dụng (Credits) và dung lượng lưu trữ (Storage Quota) để đảm bảo không block luồng tính năng. Cơ chế thực tế sẽ được ráp nối khi triển khai xong Phase 5.
-2.  **Chọn Thư mục đích:** Khi người dùng kích hoạt AI, hệ thống hiển thị Modal yêu cầu chọn **vị trí lưu** (Thư mục trong Media Explorer) cho kết quả đầu ra.
-3.  **Tạo File Mới độc lập:** AI Worker sau khi xử lý xong sẽ **KHÔNG** ghi đè lên file gốc. Hệ thống sẽ tạo ra một bản sao (bản đã áp dụng AI) và lưu vào đúng Thư mục người dùng đã chọn.
-4.  **Tránh trùng lặp tên:** Áp dụng thuật toán `resolveConflictName` (ví dụ: `Tên_File_Goc_AI_Processed (1).png`) để tránh xung đột.
-5.  **Tự động thay thế Layer:** Front-end tự động ẩn/xóa Layer Media cũ đang được chọn trên Canvas/Timeline và thay thế trực tiếp bằng MediaAsset mới, giữ nguyên các thuộc tính kích thước, vị trí.
-6.  **Xử lý lỗi (Fallback & Timeout):**
-    *   Worker cần giới hạn thời gian chạy (Timeout). Nếu quá thời gian, báo lỗi về Backend.
-    *   Giao diện người dùng phải bắt được lỗi khi Worker sập (Crashes) hoặc Timeout, hiện Toast báo lỗi "AI xử lý thất bại" và tắt loading spinner thay vì quay vòng vô tận. Có nút Retry nếu lỗi kết nối.
+### 4.4. Cơ chế Quản lý Tài nguyên AI - Tinh giản Tối đa
+*Lược bỏ mọi bước rườm rà (chọn thư mục, kiểm tra Quota) để đảm bảo tốc độ chạy Demo.*
+1.  **Lưu trực tiếp ngầm (Seamless Saving):** File kết quả AI được hệ thống tự động lưu thẳng vào thư mục ẩn "AI Generated" dưới nền. Không popup, không làm gián đoạn luồng sáng tạo của người dùng.
+2.  **Không kiểm tra Quota:** Fix cứng cơ chế AI để luôn cho phép chạy.
+3.  **Undo/Redo (Tùy chọn nếu kịp):** Lưu lại trạng thái Canvas trước khi chạy AI vào History để người dùng có thể bấm `Ctrl + Z` nếu không ưng ý với kết quả của AI.
+4.  **Xử lý lỗi thanh lịch:** Bắt lỗi Timeout khi quá 30 giây hoặc khi Python Worker sập -> Hiện một Toast message nhẹ nhàng góc phải màn hình: *"🤖 AI đang quá tải, vui lòng thử lại sau"* và tắt Spinner để người dùng tiếp tục làm việc bình thường.
 
 ---
 

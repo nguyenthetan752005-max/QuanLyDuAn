@@ -9,17 +9,38 @@ async function switchTab(tab) {
     
     const tabMedia = document.getElementById('btn-exp-media-sidebar');
     const tabTrash = document.getElementById('btn-exp-trash-sidebar');
+    const tabStock = document.getElementById('btn-exp-stock-sidebar');
+    
     const quickActions = document.getElementById('explorer-quick-actions');
     const trashNotice = document.getElementById('trash-notice-sidebar');
+    const breadcrumbs = document.getElementById('explorer-breadcrumbs-sidebar');
+    const listContainer = document.querySelector('.explorer-list-container');
+    const searchBox = document.querySelector('.sidebar-search-box');
+    const stockContainer = document.getElementById('stock-container-sidebar');
     
     if (tabMedia) tabMedia.classList.toggle('active', tab === 'media');
     if (tabTrash) tabTrash.classList.toggle('active', tab === 'trash');
+    if (tabStock) tabStock.classList.toggle('active', tab === 'stock');
     
-    if (quickActions) quickActions.hidden = tab === 'trash';
-    if (trashNotice) trashNotice.hidden = tab !== 'trash';
-    
-    await refreshEditorExplorer();
-    renderExplorerList();
+    if (tab === 'stock') {
+        if (quickActions) quickActions.style.display = 'none';
+        if (trashNotice) trashNotice.hidden = true;
+        if (breadcrumbs) breadcrumbs.style.display = 'none';
+        if (listContainer) listContainer.style.display = 'none';
+        if (searchBox) searchBox.style.display = 'none';
+        if (stockContainer) stockContainer.style.display = 'flex';
+    } else {
+        if (stockContainer) stockContainer.style.display = 'none';
+        if (listContainer) listContainer.style.display = 'block';
+        if (searchBox) searchBox.style.display = 'block';
+        if (breadcrumbs) breadcrumbs.style.display = 'flex';
+        
+        if (quickActions) quickActions.style.display = tab === 'trash' ? 'none' : 'flex';
+        if (trashNotice) trashNotice.hidden = tab !== 'trash';
+        
+        await refreshEditorExplorer();
+        renderExplorerList();
+    }
 }
 
 export function initExplorerEventListeners() {
@@ -72,10 +93,12 @@ export function initExplorerEventListeners() {
     // 3. Tab switching
     const tabMedia = document.getElementById('btn-exp-media-sidebar');
     const tabTrash = document.getElementById('btn-exp-trash-sidebar');
+    const tabStock = document.getElementById('btn-exp-stock-sidebar');
     
-    if (tabMedia && tabTrash) {
+    if (tabMedia && tabTrash && tabStock) {
         tabMedia.addEventListener('click', () => switchTab('media'));
         tabTrash.addEventListener('click', () => switchTab('trash'));
+        tabStock.addEventListener('click', () => switchTab('stock'));
     }
     
     // 4. Quick Actions

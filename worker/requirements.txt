@@ -4,3 +4,8 @@ pydantic
 requests
 yt-dlp
 playwright
+python-multipart
+rembg
+Pillow
+opencv-python-headless
+numpy

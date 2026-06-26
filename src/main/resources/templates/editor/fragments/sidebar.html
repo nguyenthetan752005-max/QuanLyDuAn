@@ -20,7 +20,22 @@
         <!-- Media / Trash Tabs -->
         <div class="explorer-tabs-container" style="padding: 0 12px 8px; display: flex; gap: 4px; border-bottom: 1px solid rgba(255,255,255,0.05);">
             <button class="exp-tab-btn active" id="btn-exp-media-sidebar" type="button" style="flex: 1; padding: 6px; font-size: 11px; border-radius: 4px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; font-weight: 500; text-align: center;">Tệp tin</button>
+            <button class="exp-tab-btn" id="btn-exp-stock-sidebar" type="button" style="flex: 1; padding: 6px; font-size: 11px; border-radius: 4px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; font-weight: 500; text-align: center;">Kho Ảnh</button>
             <button class="exp-tab-btn" id="btn-exp-trash-sidebar" type="button" style="flex: 1; padding: 6px; font-size: 11px; border-radius: 4px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; font-weight: 500; text-align: center;">Thùng rác</button>
+        </div>
+
+        <!-- Stock Container (Hidden by default) -->
+        <div id="stock-container-sidebar" style="display: none; flex-direction: column; height: 100%; padding: 0 12px 12px;">
+            <div style="margin-bottom: 10px;">
+                <input type="text" id="stock-search-input" placeholder="Tìm kiếm hình ảnh (VD: nature, city)..." style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-strong); background: var(--bg); color: var(--text); font-size: 12px;">
+            </div>
+            <div id="stock-loader" hidden style="text-align: center; padding: 20px 0;">
+                <div class="spinner spinner-sm" style="margin: 0 auto 8px;"></div>
+                <p style="font-size: 11px; color: var(--text-muted);">Đang tải ảnh...</p>
+            </div>
+            <!-- Masonry Grid for Stock Images -->
+            <div id="stock-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; overflow-y: auto; align-content: start;">
+            </div>
         </div>
 
         <!-- Explorer Quick Actions -->

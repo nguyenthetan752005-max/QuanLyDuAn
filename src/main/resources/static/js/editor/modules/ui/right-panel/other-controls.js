@@ -117,7 +117,57 @@ export function renderStickerControls(item, controls) {
     controls.appendChild(stickerTextWrapper);
 }
 
+import { removeBackground, detectAndBlurFaces } from "../ai/aiManager.js";
+
 export function renderEditControls(item, controls) {
+    // ----------------------------------------------------
+    // AI Actions
+    // ----------------------------------------------------
+    if (item.type === 'image' || item.type === 'video') {
+        const aiLabel = document.createElement('label');
+        aiLabel.className = 'edit-control-label-bold';
+        aiLabel.innerHTML = '<span style="color: #BB86FC;">✨ Tác vụ AI</span>';
+        controls.appendChild(aiLabel);
+
+        const aiGrid = document.createElement('div');
+        aiGrid.style.display = 'grid';
+        aiGrid.style.gridTemplateColumns = '1fr 1fr';
+        aiGrid.style.gap = '8px';
+        aiGrid.style.marginBottom = '16px';
+
+        const btnRemoveBg = document.createElement('button');
+        btnRemoveBg.type = 'button';
+        btnRemoveBg.className = 'dialog-button confirm-btn';
+        btnRemoveBg.style.padding = '8px';
+        btnRemoveBg.style.fontSize = '12px';
+        btnRemoveBg.style.background = 'linear-gradient(45deg, #4f46e5, #9333ea)';
+        btnRemoveBg.style.border = 'none';
+        btnRemoveBg.innerHTML = '✨ Xóa nền';
+        btnRemoveBg.addEventListener('click', () => {
+            removeBackground(item);
+        });
+
+        const btnBlurFace = document.createElement('button');
+        btnBlurFace.type = 'button';
+        btnBlurFace.className = 'dialog-button confirm-btn';
+        btnBlurFace.style.padding = '8px';
+        btnBlurFace.style.fontSize = '12px';
+        btnBlurFace.style.background = 'rgba(255,255,255,0.1)';
+        btnBlurFace.style.border = '1px solid rgba(255,255,255,0.2)';
+        btnBlurFace.innerHTML = '🕵️‍♂️ Che mặt';
+        btnBlurFace.addEventListener('click', () => {
+            detectAndBlurFaces(item);
+        });
+
+        aiGrid.appendChild(btnRemoveBg);
+        aiGrid.appendChild(btnBlurFace);
+        controls.appendChild(aiGrid);
+
+        const hrAi = document.createElement('hr');
+        hrAi.className = 'edit-control-divider';
+        controls.appendChild(hrAi);
+    }
+
     if (item.filters) {
         // One-click presets
         const presetLabel = document.createElement('label');
