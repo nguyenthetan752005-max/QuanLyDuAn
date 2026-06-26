@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -25,32 +26,41 @@ public class MediaAssetServiceTest {
     private MediaAssetRepository mediaAssetRepository;
 
     @Mock
+    private com.quanlyduan.webxulyanh.demo.repository.MediaFolderRepository mediaFolderRepository;
+
+    @Mock
+    private com.quanlyduan.webxulyanh.demo.repository.ProjectRepository projectRepository;
+
+    @Mock
     private StorageService storageService;
 
     @Mock
-    private com.quanlyduan.webxulyanh.demo.service.ActivityLogService activityLogService;
+    private com.quanlyduan.webxulyanh.demo.service.SystemSettingService systemSettingService;
 
     @InjectMocks
     private MediaAssetServiceImpl mediaAssetService;
 
     @Test
-    void uploadAsset_ShouldSaveAsset() throws Exception {
-        MultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
-
-        when(storageService.store(any(MultipartFile.class))).thenReturn("uploaded-test.jpg");
-
+    void createMediaAsset_ShouldSaveAsset() {
+        com.quanlyduan.webxulyanh.demo.dto.request.MediaAssetRequestDTO req = new com.quanlyduan.webxulyanh.demo.dto.request.MediaAssetRequestDTO();
+        req.setFileName("test.jpg");
+        req.setUserId("user1");
+        req.setFolderId("root");
+        req.setFilePath("/uploads/test.jpg");
+        req.setType(com.quanlyduan.webxulyanh.demo.enums.MediaType.IMAGE);
+        
         MediaAsset asset = new MediaAsset();
         asset.setId("asset1");
         asset.setFileName("test.jpg");
-        asset.setFilePath("uploaded-test.jpg");
-
+        asset.setFilePath("/uploads/test.jpg");
+        
+        when(mediaAssetRepository.findByUserIdAndFolderIdAndDeleted(anyString(), any(), anyBoolean())).thenReturn(java.util.Collections.emptyList());
         when(mediaAssetRepository.save(any(MediaAsset.class))).thenReturn(asset);
 
-        var result = mediaAssetService.uploadAsset(file, "user1", null);
+        var result = mediaAssetService.createMediaAsset(req);
 
         assertNotNull(result);
         assertEquals("test.jpg", result.getFileName());
-        verify(storageService).store(any(MultipartFile.class));
         verify(mediaAssetRepository).save(any(MediaAsset.class));
     }
 }
