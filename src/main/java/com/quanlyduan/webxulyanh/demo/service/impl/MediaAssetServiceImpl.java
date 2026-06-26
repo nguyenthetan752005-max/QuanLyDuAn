@@ -232,10 +232,22 @@ public class MediaAssetServiceImpl implements MediaAssetService {
         // EX-06: Chặn xóa khi file đang được sử dụng trong Timeline/Canvas
         List<Map<String, String>> usage = getMediaAssetUsage(id, userId);
         if (!usage.isEmpty()) {
-            String projectNames = usage.stream()
-                .map(m -> m.get("projectName"))
-                .collect(Collectors.joining(", "));
-            throw new IllegalStateException("Không thể xóa tệp tin đang được sử dụng trong dự án: " + projectNames + ". Vui lòng xóa vĩnh viễn dự án đó trước.");
+            boolean physicalExists = true;
+            if (mediaAsset.getFilePath() != null && mediaAsset.getFilePath().startsWith("/uploads/")) {
+                try {
+                    String filename = mediaAsset.getFilePath().substring("/uploads/".length());
+                    java.nio.file.Path rootLocation = java.nio.file.Paths.get(uploadDir);
+                    physicalExists = java.nio.file.Files.exists(rootLocation.resolve(filename));
+                } catch (Exception e) {
+                    physicalExists = false;
+                }
+            }
+            if (physicalExists) {
+                String projectNames = usage.stream()
+                    .map(m -> m.get("projectName"))
+                    .collect(Collectors.joining(", "));
+                throw new IllegalStateException("Không thể xóa tệp tin đang được sử dụng trong dự án: " + projectNames + ". Vui lòng xóa vĩnh viễn dự án đó trước.");
+            }
         }
 
         mediaAsset.setDeleted(true);
@@ -336,10 +348,22 @@ public class MediaAssetServiceImpl implements MediaAssetService {
         // EX-06: Chặn xóa khi file đang được sử dụng trong Timeline/Canvas
         List<Map<String, String>> usage = getMediaAssetUsage(id, userId);
         if (!usage.isEmpty()) {
-            String projectNames = usage.stream()
-                .map(m -> m.get("projectName"))
-                .collect(Collectors.joining(", "));
-            throw new IllegalStateException("Không thể xóa tệp tin đang được sử dụng trong dự án: " + projectNames + ". Vui lòng xóa vĩnh viễn dự án đó trước.");
+            boolean physicalExists = true;
+            if (mediaAsset.getFilePath() != null && mediaAsset.getFilePath().startsWith("/uploads/")) {
+                try {
+                    String filename = mediaAsset.getFilePath().substring("/uploads/".length());
+                    java.nio.file.Path rootLocation = java.nio.file.Paths.get(uploadDir);
+                    physicalExists = java.nio.file.Files.exists(rootLocation.resolve(filename));
+                } catch (Exception e) {
+                    physicalExists = false;
+                }
+            }
+            if (physicalExists) {
+                String projectNames = usage.stream()
+                    .map(m -> m.get("projectName"))
+                    .collect(Collectors.joining(", "));
+                throw new IllegalStateException("Không thể xóa tệp tin đang được sử dụng trong dự án: " + projectNames + ". Vui lòng xóa vĩnh viễn dự án đó trước.");
+            }
         }
 
         // Xóa file vật lý trên đĩa

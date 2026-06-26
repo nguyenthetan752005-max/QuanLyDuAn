@@ -258,7 +258,7 @@ export function toggleDropdownMenu(itemId, itemName, itemType, buttonEl) {
     
     // Position fixed to prevent scrollbar clipping issues in scroll containers
     const rect = buttonEl.getBoundingClientRect();
-    dropdown.className = 'dropdown-menu explorer-dropdown-fixed';
+    dropdown.className = 'sidebar-dropdown-menu explorer-dropdown-fixed';
     dropdown.style.top = `${rect.bottom + 4}px`;
     dropdown.style.left = `${rect.right - 130}px`;
     
