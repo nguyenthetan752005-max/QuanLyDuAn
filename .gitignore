@@ -36,7 +36,9 @@ build/
 **/src/main/resources/secret.properties
 
 ### FFmpeg Binaries ###
-/bin/
+/bin/*
+!/bin/download_ffmpeg.bat
+!/bin/download_ffmpeg.ps1
 
 ### Uploads ###
 /uploads/
