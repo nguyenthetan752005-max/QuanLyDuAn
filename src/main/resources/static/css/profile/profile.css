@@ -1,0 +1,294 @@
+/* ===== Lily Profile Page ===== */
+
+/* Anchor variant of dashboard nav items */
+a.nav-item {
+    text-decoration: none;
+}
+
+.profile-page {
+    max-width: 860px;
+}
+
+.profile-page h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 28px;
+}
+
+.profile-card {
+    background-color: var(--db-sidebar);
+    border: 1px solid var(--db-border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+/* Identity */
+.profile-identity {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.profile-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--db-accent);
+    color: #ffffff;
+    font-size: 1.8rem;
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+}
+
+.profile-identity-info h2 {
+    margin: 0 0 4px;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.profile-identity-info p {
+    margin: 0;
+    color: var(--db-text-muted);
+    font-size: 0.95rem;
+}
+
+.profile-joined {
+    margin-top: 6px !important;
+    font-size: 0.85rem !important;
+}
+
+/* Stats */
+.profile-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.profile-stats-5col {
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.stat-storage .stat-value {
+    color: var(--db-accent);
+}
+
+@media (max-width: 980px) {
+    .profile-stats-5col {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--db-text);
+}
+
+.stat-label {
+    font-size: 0.88rem;
+    color: var(--db-text-muted);
+}
+
+/* Storage quota (C5) */
+.quota-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.quota-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.quota-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.quota-text {
+    font-size: 0.85rem;
+    color: var(--db-text-muted);
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+.quota-bar {
+    height: 8px;
+    border-radius: 4px;
+    background: var(--db-hover);
+    overflow: hidden;
+}
+
+.quota-bar-fill {
+    height: 100%;
+    background: var(--db-accent);
+    width: 0;
+    transition: width 0.4s ease;
+}
+
+.quota-bar-fill.is-warn { background: var(--db-warning); }
+.quota-bar-fill.is-danger { background: var(--db-danger); }
+
+.quota-warn {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--db-danger);
+}
+
+/* Card headings */
+.profile-card-title {
+    margin: 0 0 6px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.profile-card-desc {
+    margin: 0 0 20px;
+    color: var(--db-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* Form */
+.profile-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 20px;
+}
+
+.profile-page .form-group {
+    margin-bottom: 0;
+}
+
+.profile-page .form-group input {
+    width: 100%;
+    background-color: var(--db-bg);
+    border: 1px solid var(--db-border);
+    border-radius: 8px;
+    padding: 11px 12px;
+    color: var(--db-text);
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+}
+
+.profile-page .form-group input:focus {
+    outline: none;
+    border-color: var(--db-accent);
+}
+
+.profile-form-note {
+    margin: 14px 0 0;
+    font-size: 0.82rem;
+    color: var(--db-text-muted);
+}
+
+.profile-form-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Status messages */
+#profile-status .status-message {
+    padding: 11px 14px;
+    margin-bottom: 18px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+#profile-status .msg-success {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--db-success);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+#profile-status .msg-error {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--db-danger);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Activity log (C7) */
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    max-height: 360px;
+    overflow-y: auto;
+    background: var(--db-border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.activity-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--db-bg);
+    font-size: 0.88rem;
+}
+
+.activity-icon {
+    width: 22px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.activity-desc {
+    flex: 1;
+    min-width: 0;
+    color: var(--db-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.activity-time {
+    color: var(--db-text-muted);
+    font-size: 0.78rem;
+    flex-shrink: 0;
+}
+
+.activity-empty {
+    padding: 24px;
+    text-align: center;
+    color: var(--db-text-muted);
+    font-size: 0.88rem;
+    background: var(--db-bg);
+    border-radius: 8px;
+}
+
+/* Danger zone */
+.danger-zone {
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger {
+    background-color: transparent;
+    border-color: rgba(239, 68, 68, 0.5);
+    color: var(--db-danger);
+}
+
+.btn-danger:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    border-color: var(--db-danger);
+}
+
+@media (max-width: 720px) {
+    .profile-form-grid,
+    .profile-stats {
+        grid-template-columns: 1fr;
+    }
+}

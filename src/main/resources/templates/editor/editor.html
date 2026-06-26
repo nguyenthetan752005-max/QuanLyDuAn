@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lily Image Editor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Poppins:wght@400;500;600;700&family=Montserrat:wght@400;500;700&family=Playfair+Display:wght@400;700&family=Merriweather:wght@400;700&family=Bebas+Neue&family=Oswald:wght@400;600&family=Dancing+Script:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/common/base.css(v=${#dates.createNow().getTime()})}" href="/css/common/base.css">
+    <link rel="stylesheet" th:href="@{/css/common/themes.css(v=${#dates.createNow().getTime()})}" href="/css/common/themes.css">
+    <link rel="stylesheet" th:href="@{/css/editor/layout.css(v=${#dates.createNow().getTime()})}" href="/css/editor/layout.css">
+    <link rel="stylesheet" th:href="@{/css/editor/components/index.css(v=${#dates.createNow().getTime()})}" href="/css/editor/components/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
+    <script th:src="@{/js/auth/auth.js(v=${#dates.createNow().getTime()})}" src="/js/auth/auth.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
+</head>
+<body data-theme="dark">
+<div class="app-shell">
+    <header th:replace="~{editor/fragments/topbar :: topbar}"></header>
+
+    <main class="workspace">
+        <aside th:replace="~{editor/fragments/sidebar :: sidebar}"></aside>
+        <div class="splitter-handle" data-resize-handle="left" role="separator" aria-orientation="vertical" tabindex="0"></div>
+        <section th:replace="~{editor/fragments/viewer :: viewer}"></section>
+        <div class="splitter-handle" data-resize-handle="right" role="separator" aria-orientation="vertical" tabindex="0"></div>
+        <aside class="right-panel" data-i18n-aria-label="LBL_RIGHT_PANEL"></aside>
+    </main>
+</div>
+
+<div class="dialog-backdrop" id="message-dialog" hidden>
+    <section class="message-box" role="alertdialog" aria-modal="true" aria-labelledby="message-dialog-title">
+        <h2 id="message-dialog-title" data-i18n="APP_NAME"></h2>
+        <p id="message-dialog-body"></p>
+        <div class="message-actions">
+            <button class="dialog-button" type="button" id="message-dialog-ok" data-i18n="BTN_OK"></button>
+        </div>
+    </section>
+</div>
+
+<!-- Import Social Video Dialog -->
+<div class="dialog-backdrop" id="import-social-dialog" hidden>
+    <section class="message-box" role="dialog" aria-modal="true" aria-labelledby="import-social-dialog-title">
+        <h2 id="import-social-dialog-title">Tải Video Mạng Xã Hội</h2>
+        <div style="margin: 16px 0;">
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">Nhập link từ TikTok, Douyin, Instagram hoặc YouTube. Hệ thống sẽ tải ngầm và tự động thêm vào thư mục dự án.</p>
+            <input type="text" id="import-social-url" placeholder="https://www.tiktok.com/..." style="width: 100%; padding: 8px 12px; border-radius: 4px; border: 1px solid var(--border-strong); background: var(--bg-hover); color: var(--text); box-sizing: border-box;">
+        </div>
+        <div class="social-progress-container" id="import-social-progress-container" style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 16px;" hidden>
+            <div class="progress-bar-wrapper" style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; margin-bottom: 8px;">
+                <div class="progress-bar-fill" id="import-social-progress-fill" style="width: 0%; height: 100%; background: var(--active, #3d7bfd); transition: width 0.3s ease;"></div>
+            </div>
+            <p class="progress-status-text" id="import-social-progress-status" style="font-size: 12px; color: var(--text-muted); margin: 0;">Đang chuẩn bị tải...</p>
+        </div>
+        <div class="message-actions">
+            <button class="dialog-button cancel-btn" type="button" id="import-social-dialog-cancel">Hủy bỏ</button>
+            <button class="dialog-button confirm-btn" type="button" id="import-social-dialog-ok">Bắt đầu tải</button>
+        </div>
+    </section>
+</div>
+
+<div class="dialog-backdrop" id="export-dialog" hidden>
+    <section class="message-box export-modal" role="alertdialog" aria-modal="true" aria-labelledby="export-dialog-title">
+        <h2 id="export-dialog-title">Xuất ảnh thiết kế</h2>
+        <div class="export-modal-content">
+            <!-- Left: Artboard Preview Thumbnail -->
+            <div class="export-preview-container">
+                <div class="export-preview-box" id="export-preview-box">
+                    <!-- Appended preview image -->
+                </div>
+            </div>
+            <!-- Right: Export Options -->
+            <div class="export-settings-container">
+                <div class="setting-group">
+                    <label for="export-format">Định dạng hình ảnh</label>
+                    <select id="export-format" class="export-select">
+                        <option value="png">PNG (Không nén, hỗ trợ trong suốt)</option>
+                        <option value="jpeg">JPEG (Có nén, dung lượng tối ưu)</option>
+                    </select>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="export-scale">Kích thước xuất (Tỷ lệ)</label>
+                    <select id="export-scale" class="export-select">
+                        <option value="1">1x (Kích thước thiết kế)</option>
+                        <option value="1.5">1.5x</option>
+                        <option value="2">2x (Sắc nét HD)</option>
+                        <option value="3">3x (Chất lượng cao/In ấn)</option>
+                    </select>
+                </div>
+
+                <div class="setting-group" id="export-quality-group" hidden>
+                    <label for="export-quality">Chất lượng: <span id="export-quality-value">90%</span></label>
+                    <input type="range" id="export-quality" class="export-slider" min="10" max="100" value="90">
+                </div>
+
+                <div class="setting-group checkbox-group" id="export-transparent-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="export-transparent" checked>
+                        Nền trong suốt (Không màu nền)
+                    </label>
+                </div>
+
+                <div class="setting-group" id="export-fps-group" hidden>
+                    <label for="export-fps">Tốc độ khung hình (FPS)</label>
+                    <select id="export-fps" class="export-select">
+                        <option value="30" selected>30 FPS (Mặc định)</option>
+                        <option value="60">60 FPS (Độ mượt cao)</option>
+                        <option value="24">24 FPS (Điện ảnh)</option>
+                    </select>
+                </div>
+
+                <div class="export-info" id="export-info">
+                    Kích thước hình ảnh: ---
+                </div>
+            </div>
+        </div>
+        <div class="message-actions">
+            <button class="dialog-button cancel-btn" type="button" id="export-dialog-cancel">Hủy bỏ</button>
+            <button class="dialog-button confirm-btn" type="button" id="export-dialog-download">Tải xuống</button>
+        </div>
+    </section>
+</div>
+
+<!-- Keyboard Shortcuts Dialog -->
+<div class="dialog-backdrop" id="shortcuts-dialog" hidden>
+    <section class="message-box" role="dialog" aria-modal="true" aria-labelledby="shortcuts-dialog-title" style="max-width: 520px; width: 100%;">
+        <h2 id="shortcuts-dialog-title">Phím tắt</h2>
+        <div style="padding: 16px 20px; max-height: 60vh; overflow-y: auto;">
+            <table class="shortcuts-table">
+                <tbody>
+                    <tr><td>Hoàn tác</td><td><kbd>Ctrl</kbd> + <kbd>Z</kbd></td></tr>
+                    <tr><td>Làm lại</td><td><kbd>Ctrl</kbd> + <kbd>Y</kbd> hoặc <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd></td></tr>
+                    <tr><td>Nhân bản lớp đang chọn</td><td><kbd>Ctrl</kbd> + <kbd>D</kbd></td></tr>
+                    <tr><td>Xóa lớp đang chọn</td><td><kbd>Delete</kbd> / <kbd>Backspace</kbd></td></tr>
+                    <tr><td>Phát / Dừng timeline (video)</td><td><kbd>Space</kbd></td></tr>
+                    <tr><td>Mở bảng phím tắt này</td><td><kbd>?</kbd></td></tr>
+                    <tr><td>Đóng bảng / hủy thao tác</td><td><kbd>Esc</kbd></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="message-actions">
+            <button class="dialog-button cancel-btn" type="button" id="shortcuts-dialog-close" style="width: 100%;">Đóng</button>
+        </div>
+    </section>
+</div>
+
+<!-- Version History Dialog -->
+<div class="dialog-backdrop" id="version-dialog" hidden>
+    <section class="message-box" role="dialog" aria-modal="true" aria-labelledby="version-dialog-title" style="max-width: 520px; width: 100%;">
+        <h2 id="version-dialog-title">Lịch sử phiên bản</h2>
+        <div style="padding: 16px; max-height: 60vh; overflow-y: auto;">
+            <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 12px;">
+                Lưu các mốc phiên bản của dự án và khôi phục lại khi cần. Tối đa 20 phiên bản gần nhất được giữ lại.
+            </p>
+            <button class="dialog-button confirm-btn" type="button" id="version-save-btn" style="width: 100%; margin-bottom: 14px;">+ Lưu mốc phiên bản hiện tại</button>
+            <div id="version-list" style="display: flex; flex-direction: column; gap: 8px;">
+                <p style="font-size: 12px; color: var(--text-muted); text-align: center;">Đang tải...</p>
+            </div>
+        </div>
+        <div class="message-actions">
+            <button class="dialog-button cancel-btn" type="button" id="version-dialog-close" style="width: 100%;">Đóng</button>
+        </div>
+    </section>
+</div>
+
+<!-- Rename Dialog -->
+<div class="dialog-backdrop" id="rename-dialog" hidden>
+    <section class="message-box" role="dialog" aria-modal="true" aria-labelledby="rename-dialog-title">
+        <h2 id="rename-dialog-title">Đổi tên</h2>
+        <div style="margin: 16px 0;">
+            <input type="text" id="rename-dialog-input" style="width: 100%; padding: 8px 12px; border-radius: 4px; border: 1px solid var(--border-strong); background: var(--bg-hover); color: var(--text); box-sizing: border-box;">
+        </div>
+        <div class="message-actions">
+            <button class="dialog-button cancel-btn" type="button" id="rename-dialog-cancel">Hủy bỏ</button>
+            <button class="dialog-button confirm-btn" type="button" id="rename-dialog-ok">Đồng ý</button>
+        </div>
+    </section>
+</div>
+
+<!-- Folder Dialog -->
+<div class="dialog-backdrop" id="folder-dialog" hidden>
+    <section class="message-box" role="dialog" aria-modal="true" aria-labelledby="folder-dialog-title">
+        <h2 id="folder-dialog-title">Tạo thư mục mới</h2>
+        <div style="margin: 16px 0;">
+            <input type="text" id="folder-dialog-input" placeholder="Tên thư mục..." style="width: 100%; padding: 8px 12px; border-radius: 4px; border: 1px solid var(--border-strong); background: var(--bg-hover); color: var(--text); box-sizing: border-box;">
+        </div>
+        <div class="message-actions">
+            <button class="dialog-button cancel-btn" type="button" id="folder-dialog-cancel">Hủy bỏ</button>
+            <button class="dialog-button confirm-btn" type="button" id="folder-dialog-ok">Đồng ý</button>
+        </div>
+    </section>
+</div>
+
+<!-- Move Dialog -->
+<div class="dialog-backdrop" id="move-dialog" hidden>
+    <section class="message-box" role="dialog" aria-modal="true" aria-labelledby="move-dialog-title" style="max-width: 400px; width: 100%;">
+        <h2 id="move-dialog-title">Di chuyển đến thư mục</h2>
+        <div style="margin: 16px 0;">
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Chọn thư mục đích cho tài nguyên này:</p>
+            <div id="editor-folder-tree-selector" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border-strong); padding: 8px; border-radius: 4px; background: rgba(0,0,0,0.2);">
+                <!-- Tree view for folder structure will go here -->
+            </div>
+        </div>
+        <div class="message-actions">
+            <button class="dialog-button cancel-btn" type="button" id="move-dialog-cancel">Hủy bỏ</button>
+            <button class="dialog-button confirm-btn" type="button" id="move-dialog-ok">Di chuyển</button>
+        </div>
+    </section>
+</div>
+
+<!-- Preview Dialog -->
+<div class="dialog-backdrop" id="preview-dialog" hidden>
+    <section class="message-box" role="dialog" aria-modal="true" aria-labelledby="preview-dialog-title" style="max-width: 600px; width: 100%;">
+        <h2 id="preview-dialog-title">Xem trước tài nguyên</h2>
+        <div style="margin: 16px 0; display: flex; justify-content: center; align-items: center; min-height: 250px; max-height: 400px; background: rgba(0,0,0,0.3); border-radius: 4px; overflow: hidden; border: 1px solid var(--border-strong);" id="editor-preview-dialog-body">
+            <!-- Image / Video / Audio element -->
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: var(--text-muted); margin-bottom: 12px; text-align: left;">
+            <span id="editor-preview-dialog-path" style="word-break: break-all;">Đường dẫn: --</span>
+            <span id="editor-preview-dialog-meta">Độ lớn: -- | Ngày tải: --</span>
+        </div>
+        <div class="message-actions">
+            <button class="dialog-button cancel-btn" type="button" id="preview-dialog-close" style="width: 100%;">Đóng</button>
+        </div>
+    </section>
+</div>
+
+<!-- Extract Audio Dialog -->
+<div class="dialog-backdrop" id="extract-audio-dialog" hidden>
+    <section class="message-box" role="dialog" aria-modal="true" aria-labelledby="extract-audio-dialog-title" style="max-width: 400px; width: 100%;">
+        <h2 id="extract-audio-dialog-title">Trích xuất Âm thanh</h2>
+        <div style="margin: 16px 0;">
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Chọn thư mục lưu tệp âm thanh (mp3) được trích xuất:</p>
+            <div id="editor-extract-audio-folder-tree" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border-strong); padding: 8px; border-radius: 4px; background: rgba(0,0,0,0.2);">
+                <!-- Tree view for folder structure will go here -->
+            </div>
+        </div>
+        <div class="message-actions">
+            <button class="dialog-button cancel-btn" type="button" id="extract-audio-dialog-cancel">Hủy bỏ</button>
+            <button class="dialog-button confirm-btn" type="button" id="extract-audio-dialog-ok">Trích xuất</button>
+        </div>
+    </section>
+</div>
+
+<input id="file-input" type="file" multiple hidden>
+<input id="folder-input" type="file" webkitdirectory directory multiple hidden>
+
+<!-- Templates for Video Export Dialog -->
+<template id="video-export-preview-template">
+    <div class="video-export-preview">
+        <div class="video-export-preview-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+        </div>
+        <div class="video-export-preview-title">Xem trước kết xuất video</div>
+        <div class="video-export-preview-details">
+            Độ phân giải xuất: <span class="preview-resolution">---</span> px<br>
+            Thời lượng tổng: <span class="preview-duration">---</span> giây
+        </div>
+        <div class="video-export-preview-bar">
+            <div class="video-export-preview-bar-fill"></div>
+        </div>
+    </div>
+</template>
+
+<template id="video-export-options-template">
+    <option value="webm">WebM (Tốc độ nhanh, hỗ trợ tốt nhất)</option>
+    <option value="mp4">MP4 (Phổ biến — tự chuyển WebM nếu trình duyệt không hỗ trợ)</option>
+</template>
+
+<!-- Rendering Lock Overlay -->
+<div class="dialog-backdrop" id="rendering-lock-overlay" style="z-index: 99999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); background: rgba(15, 23, 42, 0.85);" hidden>
+    <section class="message-box" style="text-align: center; max-width: 450px; padding: 32px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95)); box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+        <div class="rendering-lock-spinner-container" style="position: relative; margin: 0 auto 24px; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+            <div style="position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 4px solid transparent; border-top-color: #3b82f6; border-bottom-color: #06b6d4; animation: spin 1.5s linear infinite;"></div>
+            <div style="position: absolute; width: 75%; height: 75%; border-radius: 50%; border: 3px solid transparent; border-left-color: #5b8fff; border-right-color: #06b6d4; animation: spin-reverse 1.2s linear infinite;"></div>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: #60a5fa; z-index: 10;">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+        </div>
+        <h3 id="rendering-lock-title" style="font-family: 'Outfit', sans-serif; font-size: 1.35rem; color: #f8fafc; font-weight: 600; margin: 0 0 12px 0; background: none; border: none; padding: 0;">Dự án đang xuất bản</h3>
+        <p id="rendering-lock-desc" style="font-family: 'Inter', sans-serif; font-size: 0.9rem; color: #94a3b8; line-height: 1.5; margin: 0 0 20px 0;">Hệ thống đang tiến hành xử lý và xuất video bằng FFmpeg. Các tính năng chỉnh sửa tạm thời bị khóa cho đến khi quá trình hoàn tất.</p>
+        
+        <div class="social-progress-container" style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 8px;">
+            <div class="progress-bar-wrapper" style="height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; margin-bottom: 10px;">
+                <div class="progress-bar-fill" id="rendering-lock-progress-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, #3b82f6, #06b6d4); transition: width 0.3s ease;"></div>
+            </div>
+            <p class="progress-status-text" id="rendering-lock-progress-text" style="font-family: 'Inter', sans-serif; font-size: 0.85rem; color: #e2e8f0; font-weight: 500; margin: 0;">Đang chuẩn bị kết xuất... (0%)</p>
+        </div>
+    </section>
+</div>
+
+<style>
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@keyframes spin-reverse {
+    0% { transform: rotate(360deg); }
+    100% { transform: rotate(0deg); }
+}
+</style>
+
+<script th:src="@{/js/editor/dom-to-image.min.js(v=${#dates.createNow().getTime()})}" src="/js/editor/dom-to-image.min.js"></script>
+<script type="module" th:src="@{/js/editor/app/index.js(v=${#dates.createNow().getTime()})}" src="/js/editor/app/index.js"></script>
+</body>
+</html>
+

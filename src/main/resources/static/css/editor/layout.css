@@ -1,0 +1,174 @@
+.app-shell {
+    height: 100vh;
+    display: grid;
+    grid-template-rows: 53px 1fr;
+    padding: 0;
+    gap: 0;
+}
+
+.app-chrome {
+    position: relative;
+    z-index: 200;
+    min-width: 0;
+    display: block;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+}
+
+.workspace {
+    position: relative;
+    min-height: 0;
+    display: flex;
+    background: var(--bg);
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+}
+
+.panel {
+    min-height: 0;
+    border: 1px solid var(--border);
+    border-radius: 0;
+    background: var(--bg-elevated);
+}
+
+.sidebar {
+    position: relative;
+    width: var(--left-panel-width, 320px);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    gap: 0;
+    border-right: 1px solid var(--border-strong);
+    background: rgba(18, 19, 26, 0.9) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s;
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.25);
+    height: 100%;
+    flex-shrink: 0;
+}
+
+.sidebar.collapsed {
+    margin-left: calc(-1 * var(--left-panel-width, 320px));
+    box-shadow: none;
+}
+
+.splitter-handle {
+    width: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    cursor: col-resize;
+    position: relative;
+    transition: background 0.2s ease, width 0.2s ease;
+    z-index: 150;
+    flex-shrink: 0;
+    display: block !important;
+}
+
+[data-theme="light"] .splitter-handle,
+[data-theme="warm"] .splitter-handle,
+[data-theme="cold"] .splitter-handle {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.splitter-handle:hover,
+.splitter-handle.is-dragging {
+    background: var(--active);
+    width: 6px;
+}
+
+.viewer {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    border: none;
+    border-radius: 0;
+    height: 100%;
+}
+
+.right-panel {
+    position: relative;
+    width: var(--right-panel-width, 340px);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--border-strong);
+    background: rgba(18, 19, 26, 0.9) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s;
+    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.25);
+    height: 100%;
+    flex-shrink: 0;
+}
+
+.right-panel.collapsed {
+    margin-right: calc(-1 * var(--right-panel-width, 340px));
+    box-shadow: none;
+}
+
+/* Glassmorphism theme adaptations */
+[data-theme="light"] .sidebar,
+[data-theme="light"] .right-panel {
+    background: rgba(255, 255, 255, 0.88) !important;
+}
+[data-theme="warm"] .sidebar,
+[data-theme="warm"] .right-panel {
+    background: rgba(253, 246, 227, 0.88) !important;
+}
+[data-theme="cold"] .sidebar,
+[data-theme="cold"] .right-panel {
+    background: rgba(224, 242, 254, 0.88) !important;
+}
+
+@media (max-width: 900px) {
+    .app-shell {
+        grid-template-rows: 53px 1fr;
+    }
+
+    .workspace {
+        grid-template-columns: 1fr;
+    }
+
+    /* On small screens, panels overlay the canvas instead of stealing layout space.
+       They collapse by default; users open them via the toggle buttons in the topbar. */
+    .sidebar,
+    .right-panel {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        z-index: 200;
+        width: min(85vw, 320px);
+    }
+    .sidebar { left: 0; }
+    .right-panel { right: 0; }
+
+    .sidebar:not(.collapsed),
+    .right-panel:not(.collapsed) {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    /* When collapsed on mobile, slide fully off-screen */
+    .sidebar.collapsed {
+        margin-left: 0;
+        transform: translateX(-100%);
+    }
+    .right-panel.collapsed {
+        margin-right: 0;
+        transform: translateX(100%);
+    }
+
+    .splitter-handle { display: none !important; }
+}
+
+@media (max-width: 640px) {
+    .menubar { padding: 0 8px; gap: 4px; }
+    .menubar-left, .menubar-right { gap: 4px; }
+    .quick-action-btn { padding: 0 10px; font-size: 12px; }
+    /* Hide non-essential buttons on very small screens */
+    .project-name-wrapper, .cloud-status-badge { display: none; }
+}

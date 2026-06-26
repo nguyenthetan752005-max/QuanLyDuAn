@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section class="viewer panel" th:fragment="viewer">
+    <!-- Editor Edit Toolbar (TextBox, Paint) -->
+    <div class="editor-toolbar" id="editor-toolbar">
+        <button class="tool-btn active" id="tool-select" type="button" title="Công cụ chọn / Di chuyển">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                <path d="M4.73 3.01l13.62 13.62c.39.39.29 1.06-.21 1.3L13.9 20c-.41.2-.91.07-1.16-.3l-2.45-3.66-2.58 2.58c-.31.31-.85.09-.85-.35V3.79c0-.44.54-.66.85-.35z"/>
+            </svg>
+            <span>Chọn</span>
+        </button>
+        <button class="tool-btn" id="tool-text" type="button" title="Thêm chữ / Textbox">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="4 7 4 4 20 4 20 7"></polyline>
+                <line x1="9" y1="20" x2="15" y2="20"></line>
+                <line x1="12" y1="4" x2="12" y2="20"></line>
+            </svg>
+            <span>Thêm Chữ</span>
+        </button>
+        <button class="tool-btn" id="tool-paint" type="button" title="Cọ vẽ / Freehand Draw">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <path d="M18.85 5.15a2.5 2.5 0 1 1 3.54 3.54l-10 10-4 1 1-4z"></path>
+            </svg>
+            <span>Vẽ tự do</span>
+        </button>
+        <button class="tool-btn" id="tool-shape-rect" type="button" title="Thêm hình vuông/chữ nhật">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+            </svg>
+            <span>Hình vuông</span>
+        </button>
+        <button class="tool-btn" id="tool-shape-circle" type="button" title="Thêm hình tròn">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+            </svg>
+            <span>Hình tròn</span>
+        </button>
+        <button class="tool-btn" id="tool-shape-triangle" type="button" title="Thêm hình tam giác">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 3 22 21 2 21"></polygon>
+            </svg>
+            <span>Tam giác</span>
+        </button>
+        <button class="tool-btn" id="tool-shape-line" type="button" title="Thêm đường thẳng">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" y1="12" x2="20" y2="12"></line>
+            </svg>
+            <span>Đường kẻ</span>
+        </button>
+        <button class="tool-btn" id="tool-sticker-btn" type="button" title="Thêm nhãn dán / Emojis">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                <line x1="15" y1="9" x2="15.01" y2="9"></line>
+            </svg>
+            <span>Nhãn dán</span>
+        </button>
+        
+        <!-- Paint options (brush size, color) -->
+        <div class="paint-options-bar" id="paint-options-bar" hidden>
+            <label for="brush-color" class="paint-label">Màu sắc:</label>
+            <input type="color" id="brush-color" value="#3d7bfd" class="paint-color-input">
+            <label for="brush-size" class="paint-label paint-label-spaced">Cỡ cọ:</label>
+            <input type="range" id="brush-size" min="1" max="50" value="5" class="paint-size-input">
+            <span id="brush-size-val" class="brush-size-val">5px</span>
+            
+            <button class="tool-sub-btn active" id="tool-brush" type="button" title="Vẽ thường">Cọ vẽ</button>
+            <button class="tool-sub-btn" id="tool-eraser" type="button" title="Cục tẩy">Tẩy</button>
+            <button class="tool-sub-btn" id="tool-clear-paint" type="button" title="Xóa hết nét vẽ">Xóa hết</button>
+        </div>
+    </div>
+
+    <div class="viewer-drop-zone" id="viewer-drop-zone">
+        <!-- Canvas Rulers -->
+        <canvas class="canvas-ruler canvas-ruler-top" id="canvas-ruler-top" height="24"></canvas>
+        <canvas class="canvas-ruler canvas-ruler-left" id="canvas-ruler-left" width="24"></canvas>
+        
+        <div class="canvas-container" id="canvas-container">
+            <!-- Canvas items will be rendered here -->
+        </div>
+        <div class="drop-zone-content" id="drop-zone-content">
+            <p data-i18n="LBL_DROP_HERE"></p>
+        </div>
+    </div>
+
+    <!-- Video Timeline Panel (Initially hidden, only displayed for VIDEO projects) -->
+    <div class="timeline-panel" id="timeline-panel" hidden>
+        <!-- Timeline Controls (Play, Pause, Time Display) -->
+        <div class="timeline-toolbar">
+            <div class="timeline-controls-left">
+                <button class="timeline-btn" id="timeline-play-btn" type="button" title="Phát (Space)">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                </button>
+                <button class="timeline-btn" id="timeline-stop-btn" type="button" title="Dừng">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                        <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                    </svg>
+                </button>
+                <button class="timeline-btn" id="timeline-split-btn" type="button" title="Cắt đoạn (Split)">
+                    <svg class="timeline-btn-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="6" cy="6" r="3"></circle>
+                        <circle cx="6" cy="18" r="3"></circle>
+                        <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
+                        <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
+                        <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
+                    </svg>
+                    <span class="timeline-split-btn-label">Cắt đoạn</span>
+                </button>
+                <button class="timeline-btn" id="timeline-delete-clip-btn" type="button" title="Xóa đoạn (Delete)">
+                    <svg class="timeline-btn-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    <span class="timeline-split-btn-label">Xóa đoạn</span>
+                </button>
+                <div class="timeline-time-display">
+                    <span id="timeline-current-time">00:00.00</span> / <span id="timeline-total-time">00:10.00</span>
+                </div>
+            </div>
+            
+            <div class="timeline-controls-right">
+                <button class="timeline-btn" id="timeline-add-track-btn" type="button" title="Thêm lớp mới">
+                    <span>+ Thêm Lớp</span>
+                </button>
+                <div class="timeline-zoom-container">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                    <input type="range" id="timeline-zoom-slider" min="10" max="200" value="50" class="timeline-zoom-slider">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="timeline-body">
+            <!-- Left Side: Track Headers -->
+            <div class="timeline-track-headers" id="timeline-track-headers">
+                <!-- Track titles dynamically generated -->
+            </div>
+
+            <!-- Right Side: Ruler & Lanes Scroll Container -->
+            <div class="timeline-scroll-container" id="timeline-scroll-container">
+                <!-- Ruler for Seconds/Frames -->
+                <div class="timeline-ruler" id="timeline-ruler">
+                    <div class="timeline-ruler-canvas-wrapper">
+                        <canvas id="timeline-ruler-canvas" height="28"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Lanes where clips sit -->
+                <div class="timeline-lanes" id="timeline-lanes">
+                    <!-- Dynamic Lanes -->
+                </div>
+
+                <!-- Floating Playhead Red Line -->
+                <div class="timeline-playhead" id="timeline-playhead">
+                    <div class="timeline-playhead-handle"></div>
+                    <div class="timeline-playhead-line"></div>
+                </div>
+
+                <!-- Snapping guide line -->
+                <div class="timeline-snap-guide" id="timeline-snap-guide" hidden></div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

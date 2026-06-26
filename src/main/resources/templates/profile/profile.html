@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ — Lily</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/common/base.css}" href="/css/common/base.css">
+    <link rel="stylesheet" th:href="@{/css/common/themes.css}" href="/css/common/themes.css">
+    <link rel="stylesheet" th:href="@{/css/projects/projects.css}" href="/css/projects/projects.css">
+    <link rel="stylesheet" th:href="@{/css/profile/profile.css}" href="/css/profile/profile.css">
+    <script th:src="@{/js/auth/auth.js}" src="/js/auth/auth.js"></script>
+</head>
+<body data-theme="dark">
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar">
+            <a href="/" class="brand-section" style="text-decoration: none; color: inherit;">
+                <span class="brand-logo"></span>
+                <h2>Lily Creative</h2>
+            </a>
+
+            <nav class="sidebar-nav">
+                <a class="nav-item" href="/projects">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+                    Tất cả dự án
+                </a>
+                <a class="nav-item active" href="/profile">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Hồ sơ của tôi
+                </a>
+            </nav>
+
+            <div class="user-profile">
+                <div class="user-avatar" id="user-initials">U</div>
+                <div class="user-info">
+                    <span class="user-name" id="username-display">User</span>
+                    <span class="user-role">Thành viên</span>
+                </div>
+                <div class="logout-form">
+                    <button type="button" class="btn-logout" onclick="AuthUtil.logout()" title="Đăng xuất">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-content">
+            <section class="profile-page">
+                <h1>Hồ sơ của tôi</h1>
+
+                <!-- Identity Card -->
+                <div class="profile-card profile-identity">
+                    <div class="profile-avatar" id="profile-avatar">U</div>
+                    <div class="profile-identity-info">
+                        <h2 id="profile-username">—</h2>
+                        <p id="profile-email">—</p>
+                        <p class="profile-joined" id="profile-joined">Tham gia: —</p>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="profile-stats profile-stats-5col">
+                    <div class="profile-card stat-card">
+                        <span class="stat-value" id="stat-total">—</span>
+                        <span class="stat-label">Tổng dự án</span>
+                    </div>
+                    <div class="profile-card stat-card">
+                        <span class="stat-value" id="stat-image">—</span>
+                        <span class="stat-label">Dự án ảnh</span>
+                    </div>
+                    <div class="profile-card stat-card">
+                        <span class="stat-value" id="stat-video">—</span>
+                        <span class="stat-label">Dự án video</span>
+                    </div>
+                    <div class="profile-card stat-card">
+                        <span class="stat-value" id="stat-assets">—</span>
+                        <span class="stat-label">Tệp tin</span>
+                    </div>
+                    <div class="profile-card stat-card stat-storage">
+                        <span class="stat-value" id="stat-storage">—</span>
+                        <span class="stat-label">Dung lượng (MB)</span>
+                    </div>
+                </div>
+
+                <!-- Storage quota bar (C5) -->
+                <div class="profile-card quota-card" id="quota-card" hidden>
+                    <div class="quota-header">
+                        <span class="quota-title">Dung lượng đã sử dụng</span>
+                        <span class="quota-text" id="quota-text">— / — MB</span>
+                    </div>
+                    <div class="quota-bar"><div class="quota-bar-fill" id="quota-bar-fill"></div></div>
+                    <p class="quota-warn" id="quota-warn" hidden></p>
+                </div>
+
+                <!-- Account form -->
+                <div class="profile-card">
+                    <h3 class="profile-card-title">Thông tin tài khoản</h3>
+                    <p class="profile-card-desc">
+                        Cập nhật tên đăng nhập, email và mật khẩu.
+                        Sau khi lưu thay đổi, bạn sẽ cần đăng nhập lại.
+                    </p>
+                    <div id="profile-status"></div>
+                    <form id="profile-form">
+                        <div class="profile-form-grid">
+                            <div class="form-group">
+                                <label for="profile-input-username">Tên đăng nhập</label>
+                                <input type="text" id="profile-input-username" minlength="3" maxlength="50" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-input-email">Email</label>
+                                <input type="email" id="profile-input-email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-input-password">Mật khẩu mới</label>
+                                <input type="password" id="profile-input-password" minlength="6" placeholder="Tối thiểu 6 ký tự" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-input-password2">Xác nhận mật khẩu mới</label>
+                                <input type="password" id="profile-input-password2" minlength="6" placeholder="Nhập lại mật khẩu" required>
+                            </div>
+                        </div>
+                        <p class="profile-form-note">
+                            Lưu ý: hệ thống yêu cầu đặt mật khẩu mới mỗi khi cập nhật thông tin tài khoản.
+                        </p>
+                        <div class="profile-form-actions">
+                            <button type="submit" class="btn btn-primary" id="btn-save-profile">Lưu thay đổi</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Activity log (C7) -->
+                <div class="profile-card">
+                    <h3 class="profile-card-title">Nhật ký hoạt động gần đây</h3>
+                    <p class="profile-card-desc">50 thao tác gần nhất của bạn trên hệ thống.</p>
+                    <div id="activity-list" class="activity-list">
+                        <div class="activity-empty">Đang tải...</div>
+                    </div>
+                </div>
+
+                <!-- Danger zone -->
+                <div class="profile-card danger-zone">
+                    <h3 class="profile-card-title">Vùng nguy hiểm</h3>
+                    <p class="profile-card-desc">
+                        Xóa tài khoản sẽ xóa toàn bộ dữ liệu của bạn và không thể hoàn tác.
+                    </p>
+                    <button type="button" class="btn btn-danger" id="btn-delete-account">Xóa tài khoản</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script th:src="@{/js/profile/profile.js}" src="/js/profile/profile.js"></script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+:root {
+    /* Lily dark studio palette (default theme) */
+    --bg: #0e0f14;
+    --bg-elevated: #16171e;
+    --bg-muted: #1c1d26;
+    --bg-inset: #0a0b0f;
+    --bg-hover: #2a2c38;
+    --bg-pressed: #13141a;
+    --splitter: #23242e;
+    --border: #23242e;
+    --border-strong: #2f3140;
+    --button-bg: #21222c;
+    --button-text: #e8e8ee;
+    --text: #e8e8ee;
+    --text-muted: #8f91a0;
+    --accent: #3d7bfd;
+    --accent-border: #5b8fff;
+    --accent-soft: rgba(61, 123, 253, 0.14);
+    --active: #5b8fff;
+    --tab-bg: #1c1d26;
+    --tab-hover: #2a2c38;
+    --tab-active-bg: #16171e;
+    --menu-bg: #1c1d26;
+    --channel-red: #ff5f5f;
+    --channel-green: #46d96c;
+    --channel-blue: #4f89ff;
+    --theme-icon: url("/images/AppIconDark.png");
+    --shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+
+    /* Lily brand identity — flat, restrained accent */
+    --brand-grad: linear-gradient(180deg, #4a84ff 0%, #3567dd 100%);
+    --brand-grad-soft: rgba(61, 123, 253, 0.1);
+    --focus-ring: 0 0 0 3px rgba(61, 123, 253, 0.25);
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Outfit", "Inter", "Segoe UI", Arial, sans-serif;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button {
+    letter-spacing: 0;
+}
+
+button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+::selection {
+    background: rgba(61, 123, 253, 0.35);
+}
+
+.d-none {
+    display: none !important;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(120, 120, 120, 0.3);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(120, 120, 120, 0.5);
+}

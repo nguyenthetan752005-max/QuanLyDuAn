@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lily — Chỉnh sửa ảnh & video trực tuyến</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/common/base.css}">
+    <link rel="stylesheet" th:href="@{/css/common/themes.css}">
+    <link rel="stylesheet" th:href="@{/css/home/home.css}">
+</head>
+<body data-theme="dark" class="home-body">
+    <div class="home-glow home-glow-1" aria-hidden="true"></div>
+    <div class="home-glow home-glow-2" aria-hidden="true"></div>
+
+    <header class="home-nav">
+        <a class="home-brand" href="/">
+            <span class="home-brand-icon" aria-hidden="true"></span>
+            <span class="home-brand-name">Lily</span>
+        </a>
+        <nav class="home-nav-links">
+            <a href="#features">Tính năng</a>
+            <a th:href="@{/projects}" href="/projects">Dự án</a>
+        </nav>
+        <div class="home-nav-actions">
+            <a th:href="@{/login}" href="/login" class="home-btn home-btn-ghost">Đăng nhập</a>
+            <a th:href="@{/register}" href="/register" class="home-btn home-btn-primary">Đăng ký miễn phí</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="home-hero">
+            <span class="home-hero-badge">Studio chỉnh sửa multimedia trên trình duyệt</span>
+            <h1>Sáng tạo ảnh &amp; video<br><span class="grad-text">ngay trên web</span></h1>
+            <p class="home-hero-sub">
+                Lily giúp bạn quản lý thư viện media, thiết kế ảnh với canvas đa lớp
+                và dựng video bằng timeline đa track — lưu trữ an toàn trên cloud,
+                không cần cài đặt phần mềm.
+            </p>
+            <div class="home-actions">
+                <a th:href="@{/projects}" href="/projects" class="home-btn home-btn-primary home-btn-lg">Bắt đầu sáng tạo →</a>
+                <a th:href="@{/editor}" href="/editor" class="home-btn home-btn-outline home-btn-lg">Mở trình chỉnh sửa</a>
+            </div>
+
+            <div class="home-mock" aria-hidden="true">
+                <div class="home-mock-topbar">
+                    <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                    <span class="home-mock-title">Lily Studio — du-an-cua-toi.lily</span>
+                </div>
+                <div class="home-mock-body">
+                    <div class="home-mock-panel"></div>
+                    <div class="home-mock-canvas">
+                        <div class="home-mock-art"></div>
+                    </div>
+                    <div class="home-mock-panel"></div>
+                </div>
+                <div class="home-mock-timeline">
+                    <span class="clip clip-video"></span>
+                    <span class="clip clip-audio"></span>
+                    <span class="clip clip-text"></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="home-features" id="features">
+            <h2>Mọi công cụ bạn cần, trong một tab</h2>
+            <div class="home-feature-grid">
+                <article class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    </div>
+                    <h3>Chỉnh sửa ảnh đa lớp</h3>
+                    <p>Kéo thả, thêm chữ, vẽ tự do, hình khối, nhãn dán và bộ lọc màu trên canvas với căn chỉnh thông minh.</p>
+                </article>
+                <article class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="7" y1="4" x2="7" y2="9"/><line x1="12" y1="4" x2="12" y2="9"/><line x1="17" y1="4" x2="17" y2="9"/><polygon points="10 13.5 15 16 10 18.5 10 13.5"/></svg>
+                    </div>
+                    <h3>Dựng video timeline</h3>
+                    <p>Cắt ghép đa track video, âm thanh và chữ; render chất lượng cao bằng FFmpeg ngay trên server.</p>
+                </article>
+                <article class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 18a4 4 0 0 0 0-8 6 6 0 0 0-11.3-1.9A5 5 0 0 0 6 18Z"/><polyline points="12 11 12 17"/><polyline points="9.5 13.5 12 11 14.5 13.5"/></svg>
+                    </div>
+                    <h3>Thư viện cloud</h3>
+                    <p>Upload, phân loại theo thư mục, thùng rác khôi phục được và đồng bộ dự án tự động lên cloud.</p>
+                </article>
+                <article class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    </div>
+                    <h3>Nhập từ mạng xã hội</h3>
+                    <p>Dán link TikTok, YouTube hay Instagram — hệ thống tải ngầm và đưa thẳng vào thư viện của bạn.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="home-cta">
+            <h2>Sẵn sàng cho dự án tiếp theo?</h2>
+            <p>Tạo tài khoản miễn phí và bắt đầu chỉnh sửa trong chưa đầy một phút.</p>
+            <a th:href="@{/register}" href="/register" class="home-btn home-btn-primary home-btn-lg">Tạo tài khoản Lily</a>
+        </section>
+    </main>
+
+    <footer class="home-footer">
+        <span>© 2026 Lily Creative — Đồ án Quản lý dự án phần mềm.</span>
+    </footer>
+</body>
+</html>

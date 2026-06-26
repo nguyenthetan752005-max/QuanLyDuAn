@@ -1,0 +1,115 @@
+/* Editor Toolbar styles */
+.editor-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background-color: var(--bg);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+    flex-wrap: wrap;
+}
+
+.tool-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 13px;
+    font-size: 12.5px;
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.tool-btn:hover {
+    color: var(--text);
+    background: var(--bg-hover);
+}
+
+.tool-btn.active {
+    color: var(--active);
+    background: var(--accent-soft);
+    border-color: var(--active);
+}
+
+[data-theme="light"] .tool-btn.active {
+    color: var(--active);
+}
+
+.tool-sub-btn {
+    padding: 5px 11px;
+    font-size: 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong);
+    background: var(--button-bg);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.tool-sub-btn:hover {
+    background: var(--bg-hover);
+}
+
+.tool-sub-btn.active {
+    background: var(--active);
+    color: #15161c;
+    border-color: var(--active);
+    font-weight: 600;
+}
+
+[data-theme="light"] .tool-sub-btn.active,
+[data-theme="warm"] .tool-sub-btn.active,
+[data-theme="cold"] .tool-sub-btn.active {
+    color: #ffffff;
+}
+
+.paint-options-bar {
+    align-items: center;
+    gap: 8px;
+    margin-left: 12px;
+    border-left: 1px solid var(--border-strong);
+    padding-left: 14px;
+}
+
+.paint-label {
+    font-size: 12.5px;
+    color: var(--text-muted);
+}
+
+.paint-label-spaced {
+    margin-left: 8px;
+}
+
+.paint-color-input {
+    width: 26px;
+    height: 26px;
+    border: 1px solid var(--border-strong);
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+}
+
+.paint-size-input {
+    width: 80px;
+    height: 4px;
+    cursor: pointer;
+    accent-color: var(--active);
+}
+
+.brush-size-val {
+    font-size: 12px;
+    color: var(--text-muted);
+    min-width: 30px;
+}
+
+.tool-sticker-icon {
+    font-size: 14px;
+    margin-right: 4px;
+    line-height: 1;
+}

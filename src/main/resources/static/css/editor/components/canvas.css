@@ -1,0 +1,343 @@
+.viewer-drop-zone {
+    flex: 1;
+    position: relative;
+    overflow: hidden; /* We'll let canvas-container handle scrolling */
+    background-color: var(--bg-inset);
+    background-image: radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    background-size: 22px 22px;
+    border-radius: 0;
+    outline: 2px dashed transparent;
+    transition: outline-color 0.2s;
+}
+
+.canvas-ruler {
+    position: absolute;
+    z-index: 5;
+    background: transparent;
+}
+
+.canvas-ruler-top {
+    top: 0;
+    left: 24px;
+    right: 0;
+    width: calc(100% - 24px);
+    border-bottom: 1px solid var(--border-strong);
+}
+
+.canvas-ruler-left {
+    top: 24px;
+    left: 0;
+    bottom: 0;
+    height: calc(100% - 24px);
+    border-right: 1px solid var(--border-strong);
+}
+
+[data-theme="light"] .viewer-drop-zone,
+[data-theme="warm"] .viewer-drop-zone,
+[data-theme="cold"] .viewer-drop-zone {
+    background-image: radial-gradient(rgba(0, 0, 0, 0.06) 1px, transparent 1px);
+}
+
+.viewer-drop-zone.drag-over {
+    outline-color: var(--accent);
+    background-color: rgba(66, 153, 225, 0.1);
+}
+
+.canvas-container {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    overflow: auto;
+    pointer-events: none; /* Let drop events through when empty */
+}
+
+/* When it has items, we need pointer events */
+.canvas-container:not(:empty) {
+    pointer-events: auto;
+}
+
+.artboard-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 100%;
+    min-height: 100%;
+    padding: 40px;
+    box-sizing: border-box;
+}
+
+.artboard-scaler {
+    position: relative;
+    margin: auto;
+    flex-shrink: 0;
+}
+
+.artboard {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    background-color: white;
+    overflow: hidden;
+    flex-shrink: 0;
+    pointer-events: auto;
+    transition: width 0.3s, height 0.3s;
+    transform-origin: top left;
+}
+
+.canvas-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: move;
+    pointer-events: auto; /* Re-enable events for items */
+    user-select: none;
+    transition: outline 0.1s ease;
+    transform-origin: center;
+    box-sizing: border-box;
+    touch-action: none; /* Crucial for touchpad/touch resize */
+}
+
+.canvas-item.is-active {
+    outline: none; /* Outline is drawn by .active-selection-box */
+}
+
+.canvas-item .resize-handle,
+.active-selection-box .resize-handle {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background: #ffffff;
+    border: 2px solid var(--active);
+    z-index: 30;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    pointer-events: auto;
+}
+
+.active-selection-box.is-cropping .resize-handle {
+    border-color: #f59e0b !important;
+    background: #fffbeb !important;
+}
+
+.canvas-item .resize-handle {
+    display: none;
+}
+
+.canvas-item.is-active .resize-handle,
+.active-selection-box .resize-handle {
+    display: block;
+}
+
+.resize-handle.nw { top: -7px; left: -7px; cursor: nw-resize; }
+.resize-handle.ne { top: -7px; right: -7px; cursor: ne-resize; }
+.resize-handle.sw { bottom: -7px; left: -7px; cursor: sw-resize; }
+.resize-handle.se { bottom: -7px; right: -7px; cursor: se-resize; }
+.resize-handle.n { top: -7px; left: calc(50% - 7px); cursor: n-resize; }
+.resize-handle.s { bottom: -7px; left: calc(50% - 7px); cursor: s-resize; }
+.resize-handle.e { top: calc(50% - 7px); right: -7px; cursor: e-resize; }
+.resize-handle.w { top: calc(50% - 7px); left: -7px; cursor: w-resize; }
+
+.canvas-item:hover:not(.is-active) {
+    outline: 1px dashed var(--active);
+}
+
+/* Real-time size badge */
+.canvas-item-size-badge {
+    position: absolute;
+    bottom: -32px;
+    left: 50%;
+    transform: translateX(-50%) scale(calc(1 / var(--zoom, 1)));
+    transform-origin: top center;
+    background: rgba(9, 9, 11, 0.95);
+    border: 1px solid var(--border-strong);
+    color: #ffffff;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: inherit;
+    white-space: nowrap;
+    z-index: 40;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    display: none;
+    font-weight: 500;
+}
+
+.canvas-item.is-resizing .canvas-item-size-badge,
+.active-selection-box.is-resizing .canvas-item-size-badge {
+    display: block;
+}
+
+.artboard.is-exporting .canvas-item-size-badge {
+    display: none !important;
+}
+
+/* Smart guides alignment lines */
+.smart-guide-line {
+    position: absolute;
+    background: transparent;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.smart-guide-line.vertical {
+    top: 0;
+    bottom: 0;
+    width: 0;
+    border-left: calc(1px / var(--zoom, 1)) dashed var(--active);
+}
+
+.smart-guide-line.horizontal {
+    left: 0;
+    right: 0;
+    height: 0;
+    border-top: calc(1px / var(--zoom, 1)) dashed var(--active);
+}
+
+.artboard.is-exporting .smart-guides-container {
+    display: none !important;
+}
+
+.canvas-item.is-dragging {
+    cursor: grabbing;
+    opacity: 0.8;
+}
+
+.canvas-item img,
+.canvas-item video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: auto;
+    object-fit: fill;
+}
+
+.drop-zone-content {
+    width: calc(100% - 48px);
+    height: calc(100% - 48px);
+    margin: 24px;
+    border: 2px dashed var(--border-strong);
+    border-radius: var(--radius-lg);
+    background: var(--bg-elevated);
+    display: grid;
+    place-items: center;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+    font-size: 20px;
+    font-weight: 500;
+    z-index: 1;
+}
+
+.viewer-drop-zone.drag-over .drop-zone-content {
+    background: var(--accent-soft);
+    border-color: var(--active);
+    color: var(--active);
+    transform: scale(1.01);
+}
+
+.viewer-stage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    z-index: 10;
+    background: var(--bg-elevated);
+    padding: 20px;
+}
+
+.viewer-stage img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Canvas Item overrides for Text Layer */
+.canvas-item .text-content {
+    width: 100%;
+    height: 100%;
+    outline: none;
+    border: none;
+    background: transparent;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    word-break: break-word;
+    user-select: none;
+}
+
+.canvas-item.is-active .text-content[contenteditable="true"] {
+    user-select: text;
+    cursor: text;
+}
+
+.smart-guides-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.canvas-item .image-wrapper {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: auto;
+}
+
+.paint-canvas {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+}
+
+.shape-content {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.sticker-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    user-select: none;
+}
+
+.active-selection-box {
+    position: absolute;
+    pointer-events: none;
+    box-sizing: border-box;
+}
+
+.artboard-selection-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 1000;
+    transform-origin: top left;
+}
+
+.audio-wrapper {
+    display: none !important;
+}
+
+.canvas-item-audio {
+    width: 0px !important;
+    height: 0px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+}
+

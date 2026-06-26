@@ -1,0 +1,400 @@
+/* Video Timeline Panel */
+.timeline-panel {
+    height: 220px;
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--border-strong);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    z-index: 100;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.timeline-toolbar {
+    height: 38px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border-strong);
+}
+
+.timeline-controls-left,
+.timeline-controls-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.timeline-btn {
+    min-height: 26px;
+    padding: 2px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 4px;
+    background: var(--button-bg);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.timeline-btn:hover {
+    background: var(--bg-hover);
+    border-color: var(--active);
+}
+
+.timeline-time-display {
+    font-size: 13px;
+    font-weight: 600;
+    font-family: monospace;
+    color: var(--text-muted);
+}
+
+#timeline-current-time {
+    color: var(--active);
+}
+
+.timeline-zoom-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.timeline-body {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.timeline-track-headers {
+    width: 220px;
+    background: rgba(10, 11, 15, 0.5);
+    border-right: 1px solid var(--border-strong);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.timeline-track-header {
+    height: 48px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    background: transparent;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.timeline-track-header:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.timeline-track-header.is-active {
+    background: rgba(61, 123, 253, 0.1) !important;
+    border-left: 3px solid var(--active);
+    padding-left: 9px;
+}
+
+.track-title-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: 8px;
+}
+
+.track-title-text svg {
+    margin-right: 6px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.timeline-track-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.timeline-track-btn {
+    background: transparent;
+    border: none;
+    padding: 2px;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.timeline-track-btn:hover {
+    color: var(--text);
+    background: var(--bg-hover);
+}
+
+.timeline-track-btn.active {
+    color: var(--active);
+}
+
+.timeline-scroll-container {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+    background: rgba(10, 10, 10, 0.2);
+}
+
+.timeline-ruler {
+    height: 28px;
+    border-bottom: 1px solid var(--border-strong);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 15;
+}
+
+.timeline-ruler-canvas-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+}
+
+.timeline-lanes {
+    position: relative;
+    padding-bottom: 24px;
+}
+
+.timeline-lane {
+    height: 48px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    background: rgba(255, 255, 255, 0.01);
+    box-sizing: border-box;
+    transition: background-color 0.15s ease;
+}
+
+.timeline-lane.is-active {
+    background: rgba(61, 123, 253, 0.04) !important;
+}
+
+.timeline-lane.drag-over {
+    background: rgba(61, 123, 253, 0.15) !important;
+    border-top: 1px dashed var(--active) !important;
+    border-bottom: 1px dashed var(--active) !important;
+}
+
+.timeline-lane:nth-child(even) {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.timeline-lane:nth-child(even).is-active {
+    background: rgba(61, 123, 253, 0.06) !important;
+}
+
+.timeline-clip {
+    position: absolute;
+    top: 6px;
+    height: 36px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    color: var(--text);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: grab;
+    user-select: none;
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.timeline-clip-waveform {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.4;
+    background-image: repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255, 255, 255, 0.8) 2px, rgba(255, 255, 255, 0.8) 4px);
+    mask-image: linear-gradient(0deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0.1) 100%);
+    -webkit-mask-image: linear-gradient(0deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0.1) 100%);
+    pointer-events: none;
+}
+
+.timeline-clip-filmstrip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.3;
+    background-image: repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(0, 0, 0, 0.5) 40px, rgba(0, 0, 0, 0.5) 42px);
+    border-top: 4px dashed rgba(255,255,255,0.1);
+    border-bottom: 4px dashed rgba(255,255,255,0.1);
+    pointer-events: none;
+}
+
+/* Video Clips (Indigo) */
+.timeline-clip.type-video {
+    background: rgba(99, 102, 241, 0.18);
+    border: 1px solid rgb(99, 102, 241);
+}
+.timeline-clip.type-video:hover {
+    background: rgba(99, 102, 241, 0.28);
+}
+.timeline-clip.type-video.is-active {
+    border-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(99, 102, 241, 0.5);
+    background: rgba(99, 102, 241, 0.38);
+}
+
+/* Audio Clips (Teal) */
+.timeline-clip.type-audio {
+    background: rgba(20, 184, 166, 0.18);
+    border: 1px solid rgb(20, 184, 166);
+}
+.timeline-clip.type-audio:hover {
+    background: rgba(20, 184, 166, 0.28);
+}
+.timeline-clip.type-audio.is-active {
+    border-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(20, 184, 166, 0.5);
+    background: rgba(20, 184, 166, 0.38);
+}
+
+/* Text Clips (Amber/Orange) */
+.timeline-clip.type-text {
+    background: rgba(245, 158, 11, 0.18);
+    border: 1px solid rgb(245, 158, 11);
+}
+.timeline-clip.type-text:hover {
+    background: rgba(245, 158, 11, 0.28);
+}
+.timeline-clip.type-text.is-active {
+    border-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(245, 158, 11, 0.5);
+    background: rgba(245, 158, 11, 0.38);
+}
+
+.timeline-clip-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.timeline-clip-handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background: rgba(255, 255, 255, 0.15);
+    cursor: ew-resize;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.timeline-clip:hover .timeline-clip-handle,
+.timeline-clip.is-active .timeline-clip-handle {
+    opacity: 1;
+}
+
+.timeline-clip-handle:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.timeline-clip-handle.left {
+    left: 0;
+    border-radius: 6px 0 0 6px;
+}
+
+.timeline-clip-handle.right {
+    right: 0;
+    border-radius: 0 6px 6px 0;
+}
+
+.timeline-playhead {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    z-index: 20;
+    pointer-events: none;
+}
+
+.timeline-playhead-handle {
+    position: absolute;
+    top: 0;
+    left: -6px;
+    width: 12px;
+    height: 12px;
+    background: #ef4444;
+    border-radius: 50%;
+    cursor: ew-resize;
+    pointer-events: auto;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.timeline-playhead-line {
+    position: absolute;
+    top: 12px;
+    bottom: 0;
+    left: -0.5px;
+    width: 1px;
+    background: #ef4444;
+}
+
+.timeline-btn-icon {
+    margin-right: 6px;
+    flex-shrink: 0;
+}
+
+.timeline-split-btn-label {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.timeline-zoom-slider {
+    width: 80px;
+    height: 4px;
+    cursor: pointer;
+    accent-color: var(--active);
+}
+
+.timeline-snap-guide {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    border-left: 1.5px dashed var(--active);
+    z-index: 18;
+    pointer-events: none;
+}
+
+/* --- Timeline Context Menu --- */
+#timeline-context-menu {
+    position: fixed;
+    z-index: 10000;
+}
+
+#timeline-context-menu .menu-item svg {
+    margin-right: 8px;
+}

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lily - Project Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/common/base.css}" href="/css/common/base.css">
+    <link rel="stylesheet" th:href="@{/css/common/themes.css}" href="/css/common/themes.css">
+    <link rel="stylesheet" th:href="@{/css/projects/projects.css}" href="/css/projects/projects.css">
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
+    <script th:src="@{/js/auth/auth.js}" src="/js/auth/auth.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
+</head>
+<body data-theme="dark">
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar">
+            <a href="/" class="brand-section" style="text-decoration: none; color: inherit;">
+                <span class="brand-logo"></span>
+                <h2>Lily Creative</h2>
+            </a>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-filter="all">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+                    Tất cả dự án
+                </button>
+                <button class="nav-item" data-filter="IMAGE">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    Chỉnh sửa ảnh
+                </button>
+                <button class="nav-item" data-filter="VIDEO">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                    Chỉnh sửa video
+                </button>
+                <button class="nav-item" data-tab="explorer">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    Quản lý tệp tin
+                </button>
+                <button class="nav-item" data-tab="project-trash">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                    Thùng rác dự án
+                </button>
+                <a class="nav-item" id="nav-admin-link" href="/admin" hidden>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    Quản trị hệ thống
+                </a>
+            </nav>
+            
+            <div class="user-profile">
+                <div class="user-avatar" id="user-initials">U</div>
+                <div class="user-info">
+                    <span class="user-name" id="username-display">User</span>
+                    <span class="user-role">Thành viên</span>
+                </div>
+                <div class="logout-form">
+                    <a class="btn-profile" href="/profile" title="Hồ sơ của tôi">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </a>
+                    <button type="button" class="btn-logout" onclick="AuthUtil.logout()" title="Đăng xuất">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Workspace -->
+        <main class="dashboard-content">
+            <header class="content-header">
+                <div class="search-box-container">
+                    <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="search-input" placeholder="Tìm kiếm dự án của bạn...">
+                </div>
+                <div class="content-header-actions">
+                    <div class="notif-wrapper">
+                        <button type="button" class="notif-bell" id="notif-bell" title="Thông báo">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                            <span class="notif-badge" id="notif-badge" hidden>0</span>
+                        </button>
+                        <div class="notif-popover" id="notif-popover" hidden>
+                            <div class="notif-popover-head">
+                                <span>Thông báo</span>
+                                <button type="button" id="notif-mark-all">Đánh dấu đã đọc</button>
+                            </div>
+                            <div class="notif-list" id="notif-list">
+                                <div class="notif-empty">Đang tải…</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="btn-create-project">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Tạo dự án mới
+                    </button>
+                </div>
+            </header>
+
+            <section class="projects-section">
+                <h1 id="section-title">Tất cả dự án của tôi</h1>
+                
+                <!-- Loading indicator -->
+                <div class="loader-container" id="projects-loader">
+                    <div class="spinner"></div>
+                    <p>Đang tải danh sách dự án...</p>
+                </div>
+                
+                <!-- Empty State -->
+                <div class="empty-state" id="empty-state" hidden>
+                    <div class="empty-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="12" y1="12" x2="12" y2="18"/></svg>
+                    </div>
+                    <h3>Chưa có dự án nào</h3>
+                    <p>Hãy bắt đầu tạo dự án chỉnh sửa hình ảnh hoặc video đầu tiên của bạn.</p>
+                    <button class="btn btn-primary btn-empty-create">Tạo dự án mới</button>
+                </div>
+
+                <!-- Projects Grid -->
+                <div class="projects-grid" id="projects-grid" hidden>
+                    <!-- Dynamically populated from JS -->
+                </div>
+            </section>
+
+            <!-- Explorer Section -->
+            <section class="explorer-section" id="explorer-section" hidden>
+                <div class="explorer-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                    <div class="explorer-tabs" style="display: flex; gap: 10px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 8px;">
+                        <button class="exp-tab-btn active" id="btn-exp-media" type="button" style="padding: 8px 16px; border-radius: 6px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; font-family: inherit; font-weight: 500; transition: all 0.2s;">Tệp tin của tôi</button>
+                        <button class="exp-tab-btn" id="btn-exp-trash" type="button" style="padding: 8px 16px; border-radius: 6px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; font-family: inherit; font-weight: 500; transition: all 0.2s;">Thùng rác</button>
+                    </div>
+                    
+                    <div class="explorer-global-actions" style="display: flex; gap: 10px;">
+                        <button class="btn btn-secondary" id="btn-exp-create-folder" type="button" style="display: flex; align-items: center; gap: 6px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                            Tạo thư mục
+                        </button>
+                        <button class="btn btn-secondary" id="btn-exp-upload-file" type="button" style="display: flex; align-items: center; gap: 6px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            Tải lên tệp
+                        </button>
+                        <button class="btn btn-primary" id="btn-exp-import-social" type="button" style="display: flex; align-items: center; gap: 6px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                            Tải từ MXH
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Hidden inputs for upload -->
+                <input type="file" id="exp-file-input" multiple hidden>
+
+                <!-- Trash Notice for Days before Auto-Delete -->
+                <div class="trash-notice" id="trash-notice" style="display: flex; align-items: center; gap: 10px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; color: #ef4444;" hidden>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    <span>Lưu ý: Các thư mục và tệp tin trong Thùng rác sẽ tự động bị xóa vĩnh viễn sau <strong id="trash-days-label">30</strong> ngày.</span>
+                </div>
+
+                <!-- Breadcrumbs Navigation -->
+                <div class="explorer-breadcrumbs" id="explorer-breadcrumbs" style="display: flex; align-items: center; gap: 8px; font-size: 14px; margin-bottom: 20px; color: var(--db-text-secondary); background: rgba(255,255,255,0.02); padding: 10px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                    <!-- Dynamic -->
+                </div>
+
+                <!-- Explorer content grid container -->
+                <div class="explorer-grid-container" style="position: relative; min-height: 300px;">
+                    <!-- Loader -->
+                    <div class="loader-container" id="explorer-loader" hidden>
+                        <div class="spinner"></div>
+                        <p>Đang tải tệp tin...</p>
+                    </div>
+                    
+                    <!-- Empty State -->
+                    <div class="empty-state" id="explorer-empty" hidden>
+                        <div class="empty-icon">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        </div>
+                        <h3 id="explorer-empty-title">Thư mục trống</h3>
+                        <p id="explorer-empty-desc">Chưa có tệp tin hoặc thư mục nào ở đây.</p>
+                    </div>
+
+                    <!-- Folder/File Grid -->
+                    <div class="explorer-grid" id="explorer-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px;">
+                        <!-- Dynamic items -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Create Project Modal Dialog -->
+    <div class="modal-backdrop" id="create-modal" hidden>
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Tạo dự án mới</h3>
+                <button class="btn-close-modal" id="btn-close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="create-project-form">
+                    <div class="form-group">
+                        <label for="project-name">Tên dự án</label>
+                        <input type="text" id="project-name" placeholder="Ví dụ: Thiết kế poster quảng cáo..." required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Thể loại dự án</label>
+                        <div class="type-selector-grid">
+                            <label class="type-option-card">
+                                <input type="radio" name="project-type" value="IMAGE" checked hidden>
+                                <div class="type-option-content">
+                                    <div class="type-icon-wrapper image-type">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                    </div>
+                                    <div class="type-text">
+                                        <span class="type-title">Chỉnh sửa hình ảnh</span>
+                                        <span class="type-desc">Crop, xoay, bộ lọc màu, tách nền AI, chèn nhãn dán...</span>
+                                    </div>
+                                </div>
+                            </label>
+                            
+                            <label class="type-option-card">
+                                <input type="radio" name="project-type" value="VIDEO" hidden>
+                                <div class="type-option-content">
+                                    <div class="type-icon-wrapper video-type">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                                    </div>
+                                    <div class="type-text">
+                                        <span class="type-title">Chỉnh sửa video</span>
+                                        <span class="type-desc">Cắt phân đoạn, ghép nối video, tắt âm & chèn nhạc nền...</span>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Mẫu thiết kế nhanh (tùy chọn)</label>
+                        <div class="template-grid" id="template-grid">
+                            <button type="button" class="template-card" data-preset="1080x1920" data-type="IMAGE" data-bg="#000000">
+                                <div class="tpl-thumb" style="aspect-ratio:9/16;background:linear-gradient(135deg,#1a1a2e,#16213e);"></div>
+                                <span class="tpl-name">Story / Reel</span>
+                                <span class="tpl-dim">1080×1920</span>
+                            </button>
+                            <button type="button" class="template-card" data-preset="1080x1080" data-type="IMAGE" data-bg="#ffffff">
+                                <div class="tpl-thumb" style="aspect-ratio:1/1;background:linear-gradient(135deg,#667eea,#764ba2);"></div>
+                                <span class="tpl-name">Bài đăng vuông</span>
+                                <span class="tpl-dim">1080×1080</span>
+                            </button>
+                            <button type="button" class="template-card" data-preset="1280x720" data-type="IMAGE" data-bg="#0f172a">
+                                <div class="tpl-thumb" style="aspect-ratio:16/9;background:linear-gradient(135deg,#dc2626,#7c2d12);"></div>
+                                <span class="tpl-name">Thumbnail YouTube</span>
+                                <span class="tpl-dim">1280×720</span>
+                            </button>
+                            <button type="button" class="template-card" data-preset="1920x1080" data-type="VIDEO" data-bg="#000000">
+                                <div class="tpl-thumb" style="aspect-ratio:16/9;background:linear-gradient(135deg,#1e3a8a,#0c4a6e);"></div>
+                                <span class="tpl-name">Video Full HD</span>
+                                <span class="tpl-dim">1920×1080</span>
+                            </button>
+                            <button type="button" class="template-card" data-preset="820x312" data-type="IMAGE" data-bg="#ffffff">
+                                <div class="tpl-thumb" style="aspect-ratio:820/312;background:linear-gradient(135deg,#06b6d4,#0891b2);"></div>
+                                <span class="tpl-name">Bìa Facebook</span>
+                                <span class="tpl-dim">820×312</span>
+                            </button>
+                            <button type="button" class="template-card" data-preset="794x1123" data-type="IMAGE" data-bg="#ffffff">
+                                <div class="tpl-thumb" style="aspect-ratio:794/1123;background:linear-gradient(135deg,#f59e0b,#d97706);"></div>
+                                <span class="tpl-name">Poster A4</span>
+                                <span class="tpl-dim">794×1123</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group dimensions-group">
+                        <label>Kích thước canvas</label>
+                        <div class="preset-selector">
+                            <select id="canvas-preset">
+                                <option value="1920x1080">Full HD (1920 x 1080) - Horizontal</option>
+                                <option value="1080x1080">Square Post (1080 x 1080) - 1:1</option>
+                                <option value="1080x1920">Vertical Reel / Story (1080 x 1920)</option>
+                                <option value="1280x720">HD 720p (1280 x 720)</option>
+                                <option value="820x312">Bìa Facebook (820 x 312)</option>
+                                <option value="794x1123">Poster A4 (794 x 1123)</option>
+                                <option value="800x600">Standard (800 x 600) - Default</option>
+                                <option value="custom">Tùy chỉnh kích thước...</option>
+                            </select>
+                        </div>
+                        <div class="custom-dimensions-grid" id="custom-dimensions-grid" hidden>
+                            <div>
+                                <label for="canvas-width">Chiều rộng (px)</label>
+                                <input type="number" id="canvas-width" value="800" min="100" max="4000">
+                            </div>
+                            <div>
+                                <label for="canvas-height">Chiều cao (px)</label>
+                                <input type="number" id="canvas-height" value="600" min="100" max="4000">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" id="btn-cancel-create">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Tạo dự án</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rename Project Modal Dialog -->
+    <div class="modal-backdrop" id="rename-modal" hidden>
+        <div class="modal-card modal-small">
+            <div class="modal-header">
+                <h3>Đổi tên dự án</h3>
+                <button class="btn-close-modal" id="btn-close-rename">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="rename-project-form">
+                    <input type="hidden" id="rename-project-id">
+                    <div class="form-group">
+                        <label for="rename-project-name">Tên dự án mới</label>
+                        <input type="text" id="rename-project-name" required>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" id="btn-cancel-rename">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Đồng ý</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Rename Folder Modal Dialog -->
+    <div class="modal-backdrop" id="folder-modal" hidden>
+        <div class="modal-card modal-small">
+            <div class="modal-header">
+                <h3 id="folder-modal-title">Tạo thư mục mới</h3>
+                <button class="btn-close-modal" id="btn-close-folder">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="folder-form">
+                    <input type="hidden" id="folder-id-input">
+                    <div class="form-group">
+                        <label for="folder-name-input">Tên thư mục</label>
+                        <input type="text" id="folder-name-input" placeholder="Ví dụ: Tài nguyên, Video gốc..." required>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" id="btn-cancel-folder">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Đồng ý</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Move Item Folder Tree Modal Dialog -->
+    <div class="modal-backdrop" id="move-modal" hidden>
+        <div class="modal-card modal-medium">
+            <div class="modal-header">
+                <h3>Di chuyển đến thư mục</h3>
+                <button class="btn-close-modal" id="btn-close-move">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-kicker">Chọn thư mục đích cho tài nguyên này:</p>
+                <div class="folder-tree-selector" id="folder-tree-selector" style="max-height: 250px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.2);">
+                    <!-- Dynamic folder tree -->
+                </div>
+                <div class="modal-actions" style="margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" id="btn-cancel-move">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="btn-confirm-move">Di chuyển</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Social Modal Dialog -->
+    <div class="modal-backdrop" id="social-modal" hidden>
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Tải video từ mạng xã hội</h3>
+                <button class="btn-close-modal" id="btn-close-social">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="social-form">
+                    <div class="form-group">
+                        <label for="social-url-input">Đường dẫn video (YouTube, TikTok, Facebook, Instagram)</label>
+                        <input type="url" id="social-url-input" placeholder="https://www.tiktok.com/@user/video/..." required style="width: 100%; padding: 10px 12px; border-radius: 6px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff;">
+                    </div>
+                    
+                    <div class="social-progress-container" id="social-progress-container" style="background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;" hidden>
+                        <div class="progress-bar-wrapper" style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; margin-bottom: 10px;">
+                            <div class="progress-bar-fill" id="social-progress-fill" style="width: 0%; height: 100%; background: var(--db-accent, #3d7bfd); transition: width 0.3s ease;"></div>
+                        </div>
+                        <p class="progress-status-text" id="social-progress-status" style="font-size: 13px; color: var(--text-muted); margin: 0;">Đang chuẩn bị tải...</p>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" id="btn-cancel-social">Hủy</button>
+                        <button type="submit" class="btn btn-primary" id="btn-submit-social">Tải xuống</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Media Preview Modal Dialog -->
+    <div class="modal-backdrop" id="preview-modal" hidden>
+        <div class="modal-card modal-large">
+            <div class="modal-header">
+                <h3 id="preview-modal-title">Xem trước tài nguyên</h3>
+                <button class="btn-close-modal" id="btn-close-preview">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 16px;">
+                <div id="preview-modal-body" style="display: flex; justify-content: center; align-items: center; min-height: 300px; max-height: 500px; background: rgba(0,0,0,0.4); border-radius: 8px; overflow: hidden; margin-bottom: 16px; border: 1px solid var(--db-border-strong);">
+                    <!-- Dynamic Preview Content -->
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--db-text-muted); width: 100%;">
+                    <span id="preview-modal-path" style="word-break: break-all; margin-bottom: 2px;">Đường dẫn: --</span>
+                    <span id="preview-modal-meta">Độ lớn: -- | Ngày tải: --</span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" id="btn-cancel-preview">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" th:src="@{/js/projects/projects.js}" src="/js/projects/projects.js"></script>
+</body>
+</html>

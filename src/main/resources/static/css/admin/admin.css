@@ -1,0 +1,213 @@
+/* ===== Lily Admin Page ===== */
+.admin-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 28px 0 16px;
+}
+
+.admin-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.admin-denied {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 12px;
+    padding: 24px;
+    color: var(--db-danger);
+}
+
+.admin-denied h3 {
+    margin: 0 0 8px;
+}
+
+.admin-denied p {
+    margin: 0;
+    color: var(--db-text-muted);
+}
+
+/* User table */
+.admin-table-card {
+    padding: 0;
+    overflow: hidden;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.admin-table th,
+.admin-table td {
+    text-align: left;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--db-border);
+}
+
+.admin-table th {
+    color: var(--db-text-muted);
+    font-weight: 600;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.admin-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.admin-table tbody tr:hover {
+    background: var(--db-hover);
+}
+
+.admin-loading {
+    text-align: center !important;
+    color: var(--db-text-muted);
+    padding: 28px !important;
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.role-badge.role-admin {
+    background: rgba(61, 123, 253, 0.15);
+    color: var(--db-accent);
+}
+
+.role-badge.role-user {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--db-text-muted);
+}
+
+.btn-delete-user {
+    background: transparent;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: var(--db-danger);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.btn-delete-user:hover {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: var(--db-danger);
+}
+
+.btn-delete-user:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+#admin-status .status-message {
+    padding: 11px 14px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+#admin-status .msg-success {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--db-success);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+#admin-status .msg-error {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--db-danger);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.admin-users-toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.admin-search-box {
+    flex: 1;
+    min-width: 240px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.admin-search-box svg {
+    position: absolute;
+    left: 12px;
+    color: var(--db-text-muted);
+    pointer-events: none;
+}
+
+.admin-search-box input {
+    width: 100%;
+    background-color: var(--db-sidebar);
+    border: 1px solid var(--db-border);
+    border-radius: 8px;
+    padding: 10px 14px 10px 38px;
+    color: var(--db-text);
+    font-size: 0.92rem;
+    transition: border-color 0.2s ease;
+}
+
+.admin-search-box input:focus {
+    outline: none;
+    border-color: var(--db-accent);
+}
+
+.admin-role-filter {
+    background-color: var(--db-sidebar);
+    border: 1px solid var(--db-border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--db-text);
+    font-size: 0.92rem;
+    cursor: pointer;
+    min-width: 160px;
+}
+
+.admin-role-filter:focus {
+    outline: none;
+    border-color: var(--db-accent);
+}
+
+.backup-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+#backup-status .status-message {
+    padding: 11px 14px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+#backup-status .msg-success {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--db-success);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+#backup-status .msg-error {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--db-danger);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+@media (max-width: 720px) {
+    .admin-stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
